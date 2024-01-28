@@ -1,0 +1,6 @@
+build/*
+experimental
+.aptos/*
+*.key
+*.pub
+CLIcommands.txt
