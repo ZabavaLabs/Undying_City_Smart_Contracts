@@ -14,9 +14,8 @@ module main::eigen_shard {
     use std::signer;
     use std::string::{Self, String};
 
-    // friend main::character;
     friend main::equipment;
-    // friend main::omni_cache;
+    friend main::omni_cache;
 
     use main::admin;
 
@@ -295,8 +294,9 @@ module main::eigen_shard {
     // ANCHOR View Functions
     #[view]
     /// Returns the balance of the shard token of the owner
-    public fun shard_balance(owner_addr: address, shard: Object<EigenShardCapability>): u64 {
-        let metadata = object::convert<EigenShardCapability, Metadata>(shard);
+    public fun shard_balance(owner_addr: address): u64 {
+        let shard_object = object::address_to_object(shard_token_address());
+        let metadata = object::convert<EigenShardCapability, Metadata>(shard_object);
         let store = primary_fungible_store::ensure_primary_store_exists(owner_addr, metadata);
         fungible_asset::balance(store)
     }

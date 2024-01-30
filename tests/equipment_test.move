@@ -239,13 +239,13 @@ module main::equipment_test{
 
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
-        let shard_balance = eigen_shard::shard_balance(user1_addr, shard_token);
+        let shard_balance = eigen_shard::shard_balance(user1_addr);
 
         assert!(shard_balance == 10, 0);
 
-        equipment::upgrade_equipment(user1, char1, shard_token , 6);
+        equipment::upgrade_equipment(user1, char1, 6);
 
-        assert!(eigen_shard::shard_balance(user1_addr, shard_token) == 4, EINVALID_BALANCE);
+        assert!(eigen_shard::shard_balance(user1_addr) == 4, EINVALID_BALANCE);
 
         assert!(property_map::read_u64(&char1, &string::utf8(b"LEVEL"))==7, EINVALID_PROPERTY_VALUE);
         assert!(property_map::read_u64(&char1, &string::utf8(b"GROWTH_HP"))==10, EINVALID_PROPERTY_VALUE);
@@ -286,11 +286,11 @@ module main::equipment_test{
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
 
-        assert!(eigen_shard::shard_balance(user1_addr, shard_token) == 20, 0);
+        assert!(eigen_shard::shard_balance(user1_addr) == 20, 0);
 
-        equipment::upgrade_equipment(user1, char1, shard_token , 1);
+        equipment::upgrade_equipment(user1, char1, 1);
 
-        assert!(eigen_shard::shard_balance(user1_addr, shard_token) == 19, EINVALID_BALANCE);
+        assert!(eigen_shard::shard_balance(user1_addr) == 19, EINVALID_BALANCE);
 
         assert!(property_map::read_u64(&char1, &string::utf8(b"LEVEL"))==2, EINVALID_PROPERTY_VALUE);
         assert!(property_map::read_u64(&char1, &string::utf8(b"HP"))==110, EINVALID_PROPERTY_VALUE);
@@ -299,7 +299,7 @@ module main::equipment_test{
         assert!(property_map::read_u64(&char1, &string::utf8(b"ATK_SPD"))==19, EINVALID_PROPERTY_VALUE);
         assert!(property_map::read_u64(&char1, &string::utf8(b"MV_SPD"))==58, EINVALID_PROPERTY_VALUE);
 
-        equipment::upgrade_equipment(user1, char1, shard_token , 2);
+        equipment::upgrade_equipment(user1, char1, 2);
 
         assert!(property_map::read_u64(&char1, &string::utf8(b"LEVEL"))==4, EINVALID_PROPERTY_VALUE);
         assert!(property_map::read_u64(&char1, &string::utf8(b"HP"))==130, EINVALID_PROPERTY_VALUE);
@@ -339,7 +339,7 @@ module main::equipment_test{
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
 
-        equipment::upgrade_equipment(user2, char1, shard_token , 1);
+        equipment::upgrade_equipment(user2, char1 , 1);
 
     }
 
@@ -370,7 +370,7 @@ module main::equipment_test{
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
 
-        equipment::upgrade_equipment(user1, char1, shard_token , 49);
+        equipment::upgrade_equipment(user1, char1, 49);
     }
 
     #[test(creator = @main, user1 = @0x456, user2 = @0x789, aptos_framework = @aptos_framework)]
@@ -401,7 +401,7 @@ module main::equipment_test{
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
 
-        equipment::upgrade_equipment(user1, char1, shard_token , 50);
+        equipment::upgrade_equipment(user1, char1, 50);
     }
 
     #[test(creator = @main, user1 = @0x456, user2 = @0x789, aptos_framework = @aptos_framework)]
@@ -431,10 +431,10 @@ module main::equipment_test{
         eigen_shard::mint_shard(user1, 100);
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
-        let _ = eigen_shard::shard_balance(user1_addr, shard_token);
+        let _ = eigen_shard::shard_balance(user1_addr);
 
         equipment::set_max_weapon_level(creator, 60);
-        equipment::upgrade_equipment(user1, char1, shard_token , 55);
+        equipment::upgrade_equipment(user1, char1, 55);
     }
 
     #[test(creator = @main, user1 = @0x456, user2 = @0x789, aptos_framework = @aptos_framework)]

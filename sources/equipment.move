@@ -22,10 +22,13 @@ module main::equipment{
     use main::eigen_shard::{Self, EigenShardCapability};
 
     use main::admin::{Self, ENOT_ADMIN};
-    // use main::omni_cache;
+    use main::omni_cache;
 
     // use std::debug::print;
     // use std::vector;
+
+    friend omni_cache;
+
 
     const ENOT_OWNER: u64 = 2;
     const ECHAR_ID_NOT_FOUND: u64 = 3;
@@ -35,7 +38,6 @@ module main::equipment{
     const EMAX_LEVEL: u64 = 7;
     const EINSUFFICIENT_BALANCE: u64 = 65540;
     
-    // friend omni_cache;
 
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     struct EquipmentData has key {
@@ -319,8 +321,9 @@ module main::equipment{
         object::address_to_object(signer::address_of(&token_signer))
     }
    
-    public entry fun upgrade_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, shard_object: Object<EigenShardCapability>, amount: u64) acquires EquipmentCapability,  EquipmentData {
+    public entry fun upgrade_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, amount: u64) acquires EquipmentCapability,  EquipmentData {
         assert!(object::is_owner(equipment_object, signer::address_of(from)), ENOT_OWNER);
+        let shard_object = object::address_to_object(eigen_shard::shard_token_address());
         eigen_shard::burn_shard(from, shard_object, amount);
         let equipment_token_address = object::object_address(&equipment_object);
         let equipment = borrow_global_mut<EquipmentCapability>(equipment_token_address);

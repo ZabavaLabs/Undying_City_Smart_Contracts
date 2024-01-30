@@ -3,7 +3,7 @@ name = "main"
 version = "1.0.0"
 
 [addresses]
-main = "913cadcdf4258d2443936e5f83560afd97efa33434a52bb44b8804139a23fb02"
+main = "b1ec097914d2fea067f0ae25b6aa9c096b780aef7964ef9891b18bcdb7fd5fdf"
 aptos_framework = "0x1"
 
 [dependencies.AptosFramework]

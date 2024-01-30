@@ -78,7 +78,7 @@ module main::eigen_shard_test {
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
 
-        assert!(eigen_shard::shard_balance(user1_addr, shard_token) == 50, 0);
+        assert!(eigen_shard::shard_balance(user1_addr) == 50, 0);
 
     }
     
@@ -92,8 +92,7 @@ module main::eigen_shard_test {
 
         eigen_shard::mint_shard(user2, 50);
 
-        let shard_token = object::address_to_object(eigen_shard::shard_token_address());
-        assert!(eigen_shard::shard_balance(user2_addr, shard_token) == 50, 0);
+        assert!(eigen_shard::shard_balance(user2_addr) == 50, 0);
     }
 
 
@@ -148,7 +147,7 @@ module main::eigen_shard_test {
         eigen_shard::mint_shard(user2, 8);
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
-        assert!(eigen_shard::shard_balance(user2_addr, shard_token) == 8, 0);
+        assert!(eigen_shard::shard_balance(user2_addr) == 8, 0);
 
     }
 
