@@ -173,7 +173,7 @@ module main::equipment{
         create_equipment(user, 
         equipment_id, equipment_info_entry.name, 
         equipment_info_entry.description, equipment_info_entry.uri, 
-        equipment_info_entry.affinity_id, equipment_info_entry.equipment_part_id,
+        equipment_info_entry.equipment_part_id, equipment_info_entry.affinity_id,
         equipment_info_entry.grade, level,
         equipment_info_entry.hp, 
         equipment_info_entry.atk, equipment_info_entry.def,

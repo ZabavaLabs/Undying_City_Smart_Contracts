@@ -160,9 +160,9 @@ module main::equipment_test{
         admin::initialize_for_test(creator);
 
         let equipment_part_id = 1;
-        let affinity_id = 1;
-        let grade = 1;
-        let level = 1;
+        let affinity_id = 2;
+        let grade = 3;
+        let level = 4;
         equipment::add_equipment_entry(creator, 
         string::utf8(b"Equipment Name"), 
         string::utf8(b"Equipment Description"),
@@ -171,7 +171,7 @@ module main::equipment_test{
         affinity_id,
         grade,
         100, 10, 11, 12, 50,
-        10, 5, 5, 5, 5);
+        10, 5, 6, 7, 8);
 
         equipment::mint_equipment_for_test(user1, 0);
 
