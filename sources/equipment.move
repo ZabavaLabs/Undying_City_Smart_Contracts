@@ -196,7 +196,7 @@ module main::equipment{
         growth_atk_spd: u64, growth_mv_spd: u64
     ): Object<EquipmentCapability> acquires ResourceCapability {
 
-        let constructor_ref = token::create_from_account(
+        let constructor_ref = token::create(
             &get_token_signer(),
             string::utf8(UC_EQUIPMENT_COLLECTION_NAME),
             token_description,
@@ -355,6 +355,23 @@ module main::equipment{
         property_map::update_typed(property_mutator_ref, &string::utf8(b"ATK_SPD"), current_atk_spd + (amount * growth_atk_spd));
         property_map::update_typed(property_mutator_ref, &string::utf8(b"MV_SPD"), current_mv_spd + (amount * growth_mv_spd));
 
+    }
+    
+    // TODO: Test this function
+    public entry fun destroy_equipment(from: &signer, equipment_object: Object<EquipmentCapability>) acquires EquipmentCapability {
+        assert!(object::is_owner(equipment_object, signer::address_of(from)), ENOT_OWNER);
+        burn_equipment(from, equipment_object);
+    }
+
+    fun burn_equipment(from: &signer, equipment_object: Object<EquipmentCapability>) acquires EquipmentCapability{
+        assert!(object::is_owner(equipment_object, signer::address_of(from)), ENOT_OWNER);
+        let equipment_token = move_from<EquipmentCapability>(object::object_address(&equipment_object));
+        let EquipmentCapability {
+            mutator_ref,
+            burn_ref,
+            property_mutator_ref
+        } = equipment_token;
+        token::burn(burn_ref);
     }
 
     public entry fun set_collection_uri(caller: &signer, new_uri: String) acquires EquipmentCollectionCapability{
