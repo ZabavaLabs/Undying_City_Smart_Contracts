@@ -489,6 +489,15 @@ module main::equipment{
         smart_table::upsert(equipment_info_table, equipment_id, equipment_info_entry);
     }
 
+    public entry fun clear_equipment_info_table(
+        account: &signer, 
+        ) acquires EquipmentInfo {
+        admin::assert_is_admin(signer::address_of(account));
+
+        let equipment_info_table = &mut borrow_global_mut<EquipmentInfo>(equipment_collection_address()).table;
+        smart_table::clear(equipment_info_table);
+    }
+
     // ANCHOR Aptos View Functions
     #[view]
     public fun equipment_id_exists(equipment_id: u64): bool acquires EquipmentInfo {

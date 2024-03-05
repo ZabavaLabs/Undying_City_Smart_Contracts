@@ -76,6 +76,37 @@ module main::equipment_test{
         assert!(equipment::get_equipment_table_length()==2, EINVALID_TABLE_LENGTH)
     }
 
+    #[test(creator = @main)]
+    public fun test_equipment_addition_to_table_and_clear(creator: &signer) {
+        equipment::initialize_for_test(creator);
+        admin::initialize_for_test(creator);
+        let equipment_part_id = 1;
+        let affinity_id = 1;
+        let grade = 1;
+        equipment::add_equipment_entry(creator, 
+        string::utf8(b"Equipment Name"), 
+        string::utf8(b"Equipment Description"),
+        string::utf8(b"Equipment uri"),
+        equipment_part_id,
+        affinity_id,
+        grade,
+        100, 10, 11, 12, 50,
+        10, 5, 5, 5, 5);
+
+        equipment::add_equipment_entry(creator, 
+        string::utf8(b"Equipment Name"), 
+        string::utf8(b"Equipment Description"),
+        string::utf8(b"Equipment uri"),
+        equipment_part_id,
+        affinity_id,
+        grade,
+        100, 10, 11, 12, 50,
+        10, 5, 5, 5, 5);
+        assert!(equipment::get_equipment_table_length()==2, EINVALID_TABLE_LENGTH);
+        equipment::clear_equipment_info_table(creator);
+        assert!(equipment::get_equipment_table_length()==0, EINVALID_TABLE_LENGTH);
+    }
+
     #[test(creator = @main, user1 = @0x456 )]
     #[expected_failure(abort_code = ENOT_ADMIN, location = main::admin)]
     public fun test_add_equipment_by_others(creator: &signer, user1: &signer) {
