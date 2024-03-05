@@ -29,6 +29,8 @@ module main::equipment{
 
     friend omni_cache;
 
+    #[test_only]
+    friend main::equipment_test;
 
     const ENOT_OWNER: u64 = 2;
     const ECHAR_ID_NOT_FOUND: u64 = 3;
@@ -96,8 +98,7 @@ module main::equipment{
     
     const ROYALTY_ADDRESS: address = @main;
 
-    // TODO: Change the equipment collection uri
-    const UC_EQUIPMENT_COLLECTION_URI: vector<u8> = b"ipfs://bafybeieg74qule3esf7s4svutbkoryoo35asgqauirkglf4xokhvyffymu";
+    const UC_EQUIPMENT_COLLECTION_URI: vector<u8> = b"ipfs://bafybeiau6cmsuglb6gtdp3g3rnmzvvjfchfsvpzcthnpg7kzfyofy4qwt4";
    
     fun init_module(account: &signer) {
         let (signer_resource, token_signer_cap) = account::create_resource_account(
@@ -321,7 +322,7 @@ module main::equipment{
         object::address_to_object(signer::address_of(&token_signer))
     }
    
-    public entry fun upgrade_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, amount: u64) acquires EquipmentCapability,  EquipmentData {
+    public(friend) entry fun upgrade_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, amount: u64) acquires EquipmentCapability,  EquipmentData {
         assert!(object::is_owner(equipment_object, signer::address_of(from)), ENOT_OWNER);
         let shard_object = object::address_to_object(eigen_shard::shard_token_address());
         eigen_shard::burn_shard(from, shard_object, amount);
@@ -485,12 +486,13 @@ module main::equipment{
         smart_table::upsert(equipment_info_table, equipment_id, equipment_info_entry);
     }
 
+    // ANCHOR Aptos View Functions
+    #[view]
     public fun equipment_id_exists(equipment_id: u64): bool acquires EquipmentInfo {
         let equipment_info_table = &borrow_global<EquipmentInfo>(equipment_collection_address()).table;
         smart_table::contains(equipment_info_table, equipment_id)
     }
 
-    // ANCHOR Aptos View Functions
     #[view]
     public fun capability_address(): address {
         account::create_resource_address(&@main, APP_SIGNER_CAPABILITY_SEED)

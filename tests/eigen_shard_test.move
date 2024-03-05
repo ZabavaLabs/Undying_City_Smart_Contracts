@@ -47,7 +47,7 @@ module main::eigen_shard_test {
     /// The shard collection description
     const EIGEN_SHARD_COLLECTION_DESCRIPTION: vector<u8> = b"This collection stores the Eigen Shard token." ;
     /// The shard collection URI
-    const EIGEN_SHARD_COLLECTION_URI: vector<u8> = b"https://undyingcity.zabavalabs.com/shard/collection";
+    const EIGEN_SHARD_COLLECTION_URI: vector<u8> = b"https://doc.undyingcity.zabavalabs.com";
 
    /// The shard token name
     const EIGEN_SHARD_TOKEN_NAME: vector<u8> = b"Eigen Shard";
@@ -58,7 +58,7 @@ module main::eigen_shard_test {
     const PROJECT_URI: vector<u8> = b"https://undyingcity.zabavalabs.com";
     //Point to Image
     const PROJECT_ICON_URI: vector<u8> = b"ipfs://bafybeiee6ziwznlaullflnzeqpvvdtweb7pehp572xcafkwawvtun2me4y";
-    const URI: vector<u8> = b"https://github.com/ZabavaLabs/Undying_City_Smart_Contracts";
+    const URI: vector<u8> = b"ipfs://bafybeiee6ziwznlaullflnzeqpvvdtweb7pehp572xcafkwawvtun2me4y";
 
 
     use main::eigen_shard::{Self, EigenShardCapability, ShardCollectionCapability};
@@ -119,17 +119,17 @@ module main::eigen_shard_test {
         // assert!(coin::balance<AptosCoin>(user1_addr) == 11_00_000_000, EINVALID_BALANCE);
         // assert!(coin::balance<AptosCoin>(creator_addr) == 15_50_000_000, EINVALID_BALANCE);
         // assert!(coin::balance<AptosCoin>(user2_addr) == 3_50_000_000, EINVALID_BALANCE);
-        eigen_shard::mint_shard(user2, 50);
+        eigen_shard::mint_shard(user2, 500);
         assert!(coin::balance<AptosCoin>(signer::address_of(user2)) == 50_000_000, EINVALID_BALANCE);
         assert!(coin::balance<AptosCoin>(creator_addr) == 150_000_000, EINVALID_BALANCE);
 
         eigen_shard::set_buy_back_address(creator, user1_addr);
-        eigen_shard::mint_shard(user2, 10);
+        eigen_shard::mint_shard(user2, 100);
         assert!(coin::balance<AptosCoin>(user1_addr) == 105_000_000, EINVALID_BALANCE);
         assert!(coin::balance<AptosCoin>(creator_addr) == 155_000_000, EINVALID_BALANCE);
 
         eigen_shard::set_company_revenue_address(creator, user2_addr);
-        eigen_shard::mint_shard(user2, 10);
+        eigen_shard::mint_shard(user2, 100);
         assert!(coin::balance<AptosCoin>(user1_addr) == 110_000_000, EINVALID_BALANCE);
         assert!(coin::balance<AptosCoin>(creator_addr) == 155_000_000, EINVALID_BALANCE);
         assert!(coin::balance<AptosCoin>(user2_addr) == 35_000_000, EINVALID_BALANCE);

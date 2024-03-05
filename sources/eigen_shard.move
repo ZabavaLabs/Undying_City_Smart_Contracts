@@ -50,7 +50,7 @@ module main::eigen_shard {
     /// The shard collection description
     const EIGEN_SHARD_COLLECTION_DESCRIPTION: vector<u8> = b"This collection stores the Eigen Shard token." ;
     /// The shard collection URI
-    const EIGEN_SHARD_COLLECTION_URI: vector<u8> = b"https://undyingcity.zabavalabs.com/shard/collection";
+    const EIGEN_SHARD_COLLECTION_URI: vector<u8> = b"https://doc.undyingcity.zabavalabs.com";
 
    /// The shard token name
     const EIGEN_SHARD_TOKEN_NAME: vector<u8> = b"Eigen Shard";
@@ -61,7 +61,7 @@ module main::eigen_shard {
     const PROJECT_URI: vector<u8> = b"https://undyingcity.zabavalabs.com";
     //Point to Image
     const PROJECT_ICON_URI: vector<u8> = b"ipfs://bafybeiee6ziwznlaullflnzeqpvvdtweb7pehp572xcafkwawvtun2me4y";
-    const URI: vector<u8> = b"https://github.com/ZabavaLabs/Undying_City_Smart_Contracts";
+    const URI: vector<u8> = b"ipfs://bafybeiee6ziwznlaullflnzeqpvvdtweb7pehp572xcafkwawvtun2me4y";
 
 
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
@@ -109,7 +109,7 @@ module main::eigen_shard {
             company_revenue_address: signer::address_of(caller),
             buy_back_address: signer::address_of(caller),
             minimum_shard_mint_amount: 10,
-            apt_cost_per_shard: 1_000_000
+            apt_cost_per_shard: 1_00_000
         };
 
         move_to(caller, settings);
@@ -346,9 +346,9 @@ module main::eigen_shard {
         // coin::deposit(signer::address_of(user1), coin::mint(10_00_000_000, &mint_cap));
         // coin::deposit(signer::address_of(user2), coin::mint(10_00_000_000, &mint_cap));
 
-        coin::deposit(signer::address_of(creator), coin::mint(100_000_000, &mint_cap));
-        coin::deposit(signer::address_of(user1), coin::mint(100_000_000, &mint_cap));
-        coin::deposit(signer::address_of(user2), coin::mint(100_000_000, &mint_cap));
+        coin::deposit(signer::address_of(creator), coin::mint(1_00_000_000, &mint_cap));
+        coin::deposit(signer::address_of(user1), coin::mint(1_00_000_000, &mint_cap));
+        coin::deposit(signer::address_of(user2), coin::mint(1_00_000_000, &mint_cap));
 
 
         coin::destroy_burn_cap(burn_cap);

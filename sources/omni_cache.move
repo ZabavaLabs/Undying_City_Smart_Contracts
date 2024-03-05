@@ -20,6 +20,9 @@ module main::omni_cache{
     use main::equipment;
 
 
+    #[test_only]
+    friend main::omni_cache_test;
+
 
     const ENOT_OWNER: u64 = 2;
     const EEVENT_ID_NOT_FOUND: u64 = 3;
@@ -78,7 +81,7 @@ module main::omni_cache{
         move_to(account,special_events_info_entry);
 
         let omni_cache_data = OmniCacheData{
-            shards_to_unlock_cache: 2,
+            shards_to_unlock_cache: 100,
             normal_equipment_weight: 100,
             special_equipment_weight: 0,
         };
@@ -118,7 +121,7 @@ module main::omni_cache{
 
   
 
-    public entry fun unlock_cache(account:&signer) acquires OmniCacheData, SpecialEquipmentCacheData, NormalEquipmentCacheData{
+    public(friend) entry fun unlock_cache(account:&signer) acquires OmniCacheData, SpecialEquipmentCacheData, NormalEquipmentCacheData{
         let omni_cache_data = borrow_global<OmniCacheData>(@main);
         let shards_spend = omni_cache_data.shards_to_unlock_cache;
         let shard_object = object::address_to_object(eigen_shard::shard_token_address());
@@ -145,7 +148,7 @@ module main::omni_cache{
     }
 
 
-    public entry fun unlock_cache_via_event(account:&signer) acquires OmniCacheData, SpecialEquipmentCacheData, NormalEquipmentCacheData, SpecialEventsInfoEntry{
+    public(friend) entry fun unlock_cache_via_event(account:&signer) acquires OmniCacheData, SpecialEquipmentCacheData, NormalEquipmentCacheData, SpecialEventsInfoEntry{
         let omni_cache_data = borrow_global<OmniCacheData>(@main);
         
         let account_addr = signer::address_of(account);

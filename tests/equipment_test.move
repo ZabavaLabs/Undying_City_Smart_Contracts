@@ -40,7 +40,7 @@ module main::equipment_test{
     const ROYALTY_ADDRESS: address = @main;
 
     // TODO: Change the equipment collection uri
-    const UC_EQUIPMENT_COLLECTION_URI: vector<u8> = b"ipfs://bafybeieg74qule3esf7s4svutbkoryoo35asgqauirkglf4xokhvyffymu";
+    const UC_EQUIPMENT_COLLECTION_URI: vector<u8> = b"ipfs://bafybeiau6cmsuglb6gtdp3g3rnmzvvjfchfsvpzcthnpg7kzfyofy4qwt4";
    
 
 

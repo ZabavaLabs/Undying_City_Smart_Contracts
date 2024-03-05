@@ -124,7 +124,7 @@ module main::omni_cache_test{
         timestamp::update_global_time_for_test(1000);
 
 
-        eigen_shard::mint_shard(creator,10);
+        eigen_shard::mint_shard(creator,100);
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
         omni_cache::unlock_cache(creator);
         
@@ -198,7 +198,7 @@ module main::omni_cache_test{
         timestamp::update_global_time_for_test(1000);
 
 
-        eigen_shard::mint_shard(user1,30);
+        eigen_shard::mint_shard(user1,500);
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
         
         let equipment_part_id = 1;
@@ -242,7 +242,7 @@ module main::omni_cache_test{
         omni_cache::unlock_cache(user1);
         omni_cache::unlock_cache(user1);
 
-        assert!(eigen_shard::shard_balance(user1_addr) == 24, 0);
+        assert!(eigen_shard::shard_balance(user1_addr) == 200, 0);
 
     }
 
