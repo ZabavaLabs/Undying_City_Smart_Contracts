@@ -38,6 +38,7 @@ module main::equipment{
     const EINVALID_PROPERTY_VALUE: u64 = 5;
     const EINVALID_BALANCE: u64 = 6;
     const EMAX_LEVEL: u64 = 7;
+    const EINVALID_COLLECTION: u64 = 8;
     const EINSUFFICIENT_BALANCE: u64 = 65540;
     
 
@@ -324,6 +325,8 @@ module main::equipment{
    
     public(friend) entry fun upgrade_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, amount: u64) acquires EquipmentCapability,  EquipmentData {
         assert!(object::is_owner(equipment_object, signer::address_of(from)), ENOT_OWNER);
+        let collection = token::collection_object(equipment_object);
+        assert!(object::object_address(&collection) == equipment_collection_address(), EINVALID_COLLECTION);
         let shard_object = object::address_to_object(eigen_shard::shard_token_address());
         eigen_shard::burn_shard(from, shard_object, amount);
         let equipment_token_address = object::object_address(&equipment_object);
