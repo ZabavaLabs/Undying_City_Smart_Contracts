@@ -27,6 +27,8 @@ module main::pseudorandom {
 
     use main::bcd;
 
+    friend main::omni_cache;
+
     /// Resource that wraps an integer counter.
     struct Counter has key {
         value: u64
@@ -101,38 +103,38 @@ module main::pseudorandom {
     }
 
     /// Generate a random u128
-    public fun rand_u128_with_seed(_seed: vector<u8>): u128 {
+    public(friend) fun rand_u128_with_seed(_seed: vector<u8>): u128 {
         bcd::bytes_to_u128(_seed)
     }
 
     /// Generate a random integer range in [low, high).
-    public fun rand_u128_range_with_seed(_seed: vector<u8>, low: u128, high: u128): u128 {
+    public(friend) fun rand_u128_range_with_seed(_seed: vector<u8>, low: u128, high: u128): u128 {
         assert!(high > low, error::invalid_argument(EHIGH_ARG_GREATER_THAN_LOW_ARG));
         let value = rand_u128_with_seed(_seed);
         (value % (high - low)) + low
     }
 
     /// Generate a random u64
-    public fun rand_u64_with_seed(_seed: vector<u8>): u64 {
+    public(friend) fun rand_u64_with_seed(_seed: vector<u8>): u64 {
         bcd::bytes_to_u64(_seed)
     }
 
     /// Generate a random integer range in [low, high).
-    public fun rand_u64_range_with_seed(_seed: vector<u8>, low: u64, high: u64): u64 {
+    public(friend) fun rand_u64_range_with_seed(_seed: vector<u8>, low: u64, high: u64): u64 {
         assert!(high > low, error::invalid_argument(EHIGH_ARG_GREATER_THAN_LOW_ARG));
         let value = rand_u64_with_seed(_seed);
         (value % (high - low)) + low
     }
 
-    public fun rand_u128(sender: &address): u128 acquires Counter { rand_u128_with_seed(seed(sender)) }
-    public fun rand_u128_range(sender: &address, low: u128, high: u128): u128 acquires Counter { rand_u128_range_with_seed(seed(sender), low, high) }
-    public fun rand_u64(sender: &address): u64 acquires Counter { rand_u64_with_seed(seed(sender)) }
-    public fun rand_u64_range(sender: &address, low: u64, high: u64): u64 acquires Counter { rand_u64_range_with_seed(seed(sender), low, high) }
+    public(friend) fun rand_u128(sender: &address): u128 acquires Counter { rand_u128_with_seed(seed(sender)) }
+    public(friend) fun rand_u128_range(sender: &address, low: u128, high: u128): u128 acquires Counter { rand_u128_range_with_seed(seed(sender), low, high) }
+    public(friend) fun rand_u64(sender: &address): u64 acquires Counter { rand_u64_with_seed(seed(sender)) }
+    public(friend) fun rand_u64_range(sender: &address, low: u64, high: u64): u64 acquires Counter { rand_u64_range_with_seed(seed(sender), low, high) }
 
-    public fun rand_u128_no_sender(): u128 acquires Counter { rand_u128_with_seed(seed_no_sender()) }
-    public fun rand_u128_range_no_sender(low: u128, high: u128): u128 acquires Counter { rand_u128_range_with_seed(seed_no_sender(), low, high) }
-    public fun rand_u64_no_sender(): u64 acquires Counter { rand_u64_with_seed(seed_no_sender()) }
-    public fun rand_u64_range_no_sender(low: u64, high: u64): u64 acquires Counter { rand_u64_range_with_seed(seed_no_sender(), low, high) }
+    public(friend) fun rand_u128_no_sender(): u128 acquires Counter { rand_u128_with_seed(seed_no_sender()) }
+    public(friend) fun rand_u128_range_no_sender(low: u128, high: u128): u128 acquires Counter { rand_u128_range_with_seed(seed_no_sender(), low, high) }
+    public(friend) fun rand_u64_no_sender(): u64 acquires Counter { rand_u64_with_seed(seed_no_sender()) }
+    public(friend) fun rand_u64_range_no_sender(low: u64, high: u64): u64 acquires Counter { rand_u64_range_with_seed(seed_no_sender(), low, high) }
 
     #[test_only]
     public fun initialize_for_test(account: &signer){

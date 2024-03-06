@@ -103,28 +103,13 @@ const add_equipment = async () => {
 
 
     // Call the function with the file path
-    let { headers, rowData } = await readCSV('./data/equipment_data.csv');
+    let { headers, rowData } = await readCSV(filePath);
 
-    // name: String, 
-    // description: String, 
-    // uri: String,
-    // equipment_part_id: u64,
-    // affinity_id: u64, 
-    // grade: u64,
-    // hp: u64, 
-    // atk: u64,
-    // def: u64, 
-    // atk_spd: u64, 
-    // mv_spd: u64,
-    // growth_hp:u64,
-    // growth_atk:u64,
-    // growth_def:u64,
-    // growth_atk_spd:u64,
-    // growth_mv_spd:u64
-
+    let transaction;
+    let committedTransaction;
     console.log(`rowData ${rowData}`);
     for (let i = 0; i < rowData.length; i++) {
-        const transaction = await aptos.transaction.build.simple({
+        transaction = await aptos.transaction.build.simple({
             sender: main.accountAddress,
             data: {
                 function: `${account_data.profiles.default.account}::equipment::add_equipment_entry`,
@@ -134,8 +119,13 @@ const add_equipment = async () => {
         });
         console.log(`Sending add_equipment transaction`);
 
-        const committedTransaction = await aptos.signAndSubmitTransaction({ signer: main, transaction });
+        committedTransaction = await aptos.signAndSubmitTransaction({ signer: main, transaction });
         console.log(`Transaction hash: ${committedTransaction.hash}`);
+        const status = await aptos.waitForTransaction({ transactionHash: committedTransaction.hash })
+        if (!status.success) {
+            console.log(`Transaction failed at: ${i}`);
+            break;
+        }
     }
 
     // Fund the accounts

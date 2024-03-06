@@ -5,8 +5,9 @@
 /// @notice BCD = Binary canoncial DEserialization.
 module main::bcd {
     use std::vector;
+    friend main::pseudorandom;
 
-    public fun bytes_to_u128(bytes: vector<u8>): u128 {
+    public(friend) fun bytes_to_u128(bytes: vector<u8>): u128 {
         let value = 0u128;
         let i = 0u64;
         while (i < 16) {
@@ -16,7 +17,7 @@ module main::bcd {
         return value
     }
 
-    public fun bytes_to_u64(bytes: vector<u8>): u64 {
+    public(friend) fun bytes_to_u64(bytes: vector<u8>): u64 {
         let value = 0u64;
         let i = 0u64;
         while (i < 8) {
