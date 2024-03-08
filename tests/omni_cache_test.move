@@ -29,6 +29,10 @@ module main::omni_cache_test{
     use main::pseudorandom::{Self};
     use main::equipment;
 
+    // use aptos_framework::randomness;
+    // #[test_only]
+    // use aptos_std::crypto_algebra::enable_cryptography_algebra_natives;
+
     const EINVALID_TABLE_LENGTH: u64 = 1;
     const EWHITELIST_AMOUNT: u64 = 2;
     const EINVALID_SPECIAL_EVENT_DETAIL: u64 = 3;
@@ -53,6 +57,10 @@ module main::omni_cache_test{
         admin::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
         timestamp::set_time_has_started_for_testing(aptos_framework);
+
+        // randomness::initialize_for_testing(aptos_framework);
+        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+
         let timestamp: u64 = timestamp::now_microseconds();
 
         let event_name = string::utf8(b"First Mint Event");
@@ -109,6 +117,9 @@ module main::omni_cache_test{
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
+
+        // randomness::initialize_for_testing(aptos_framework);
+        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
@@ -185,6 +196,9 @@ module main::omni_cache_test{
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
 
+        // randomness::initialize_for_testing(aptos_framework);
+        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
         block::initialize_for_test(aptos_framework, 5);
@@ -256,6 +270,9 @@ module main::omni_cache_test{
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
 
+        // randomness::initialize_for_testing(aptos_framework);
+        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
         block::initialize_for_test(aptos_framework, 5);
@@ -301,6 +318,9 @@ module main::omni_cache_test{
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
 
+        // randomness::initialize_for_testing(aptos_framework);
+        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
         block::initialize_for_test(aptos_framework, 5);
@@ -338,6 +358,228 @@ module main::omni_cache_test{
     }
 
     #[test(creator = @main, user1 = @0x456, user2 = @0x678, user3= @0x789, aptos_framework = @aptos_framework)]
+    public fun test_unlock_cache_via_event_2(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
+        admin::initialize_for_test(creator);
+        pseudorandom::initialize_for_test(creator);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
+        eigen_shard::initialize_for_test(creator);
+        equipment::initialize_for_test(creator);
+        omni_cache::initialize_for_test(creator);
+
+        // randomness::initialize_for_testing(aptos_framework);
+        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+
+        account::create_account_for_test(@aptos_framework);
+        timestamp::set_time_has_started_for_testing(aptos_framework);
+        block::initialize_for_test(aptos_framework, 5);
+        
+        let _: u64 = timestamp::now_microseconds();
+        let _ = string::utf8(b"First Mint Event");
+        let user1_addr = signer::address_of(user1);
+        let user2_addr = signer::address_of(user2);
+        let user3_addr = signer::address_of(user3);
+        let _ = signer::address_of(creator);
+        
+        timestamp::update_global_time_for_test(1000);
+
+        let equipment_part_id = 1;
+        let affinity_id = 1;
+        let grade = 1;
+        equipment::add_equipment_entry(creator, 
+        string::utf8(b"Equipment Name 1"), 
+        string::utf8(b"Equipment Description 1"),
+        string::utf8(b"Equipment uri 1"),
+        equipment_part_id,
+        affinity_id,
+        grade,
+        100, 10, 11, 12, 50,
+        10, 5, 5, 5, 5);
+        equipment::add_equipment_entry(creator, 
+        string::utf8(b"Equipment Name 2"), 
+        string::utf8(b"Equipment Description 2"),
+        string::utf8(b"Equipment uri 2"),
+        equipment_part_id,
+        affinity_id,
+        grade,
+        100, 10, 11, 12, 50,
+        10, 5, 5, 5, 5);
+        equipment::add_equipment_entry(creator, 
+        string::utf8(b"Equipment Name 3"), 
+        string::utf8(b"Equipment Description 3"),
+        string::utf8(b"Equipment uri 3"),
+        equipment_part_id,
+        affinity_id,
+        grade,
+        100, 10, 11, 12, 50,
+        10, 5, 5, 5, 5);
+        equipment::add_equipment_entry(creator, 
+        string::utf8(b"Equipment Name 4"), 
+        string::utf8(b"Equipment Description 4"),
+        string::utf8(b"Equipment uri 4"),
+        equipment_part_id,
+        affinity_id,
+        grade,
+        100, 10, 11, 12, 50,
+        10, 5, 5, 5, 5);
+
+        omni_cache::add_equipment_to_cache(creator, 0, 0);
+        omni_cache::add_equipment_to_cache(creator, 0, 1);
+        omni_cache::add_equipment_to_cache(creator, 0, 2);
+        omni_cache::add_equipment_to_cache(creator, 1, 3);
+
+
+        omni_cache::add_whitelist_addresses(creator, vector[user1_addr,user2_addr,user3_addr], vector[2,3,4]);
+        omni_cache::modify_special_event_struct(creator, string::utf8(b"Mint Event"),0,10000 );
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user1);
+
+        omni_cache::unlock_cache_via_event(user2);
+        omni_cache::unlock_cache_via_event(user2);
+        omni_cache::unlock_cache_via_event(user2);
+        // omni_cache::unlock_cache_via_event(user3);
+        // omni_cache::unlock_cache_via_event(user3);
+        // omni_cache::unlock_cache_via_event(user3);
+        // omni_cache::unlock_cache_via_event(user3);
+
+    }
+
+    #[test(creator = @main, user1 = @0x456, user2 = @0x678, user3= @0x789, aptos_framework = @aptos_framework)]
+    public fun test_modify_omni_cache(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
+        admin::initialize_for_test(creator);
+        pseudorandom::initialize_for_test(creator);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
+        eigen_shard::initialize_for_test(creator);
+        equipment::initialize_for_test(creator);
+        omni_cache::initialize_for_test(creator);
+
+        // randomness::initialize_for_testing(aptos_framework);
+        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+
+        account::create_account_for_test(@aptos_framework);
+        timestamp::set_time_has_started_for_testing(aptos_framework);
+        block::initialize_for_test(aptos_framework, 5);
+        
+        let _: u64 = timestamp::now_microseconds();
+        let _ = string::utf8(b"First Mint Event");
+        let user1_addr = signer::address_of(user1);
+        let user2_addr = signer::address_of(user2);
+        let user3_addr = signer::address_of(user3);
+        let _ = signer::address_of(creator);
+        
+        timestamp::update_global_time_for_test(1000);
+
+        let equipment_part_id = 1;
+        let affinity_id = 1;
+        let grade = 1;
+        let (shards_to_mint, normal_weight, special_weight)  = omni_cache::get_omni_cache_data();
+        assert!(shards_to_mint==100,1);
+        assert!(normal_weight==100,1);
+        assert!(special_weight==0,1);
+        omni_cache::modify_omni_cache_data(creator,50,30,22);
+        (shards_to_mint, normal_weight, special_weight)  = omni_cache::get_omni_cache_data();
+        assert!(shards_to_mint==50,1);
+        assert!(normal_weight==30,1);
+        assert!(special_weight==22,1);
+    }
+
+    #[test(creator = @main, user1 = @0x456, user2 = @0x678, user3= @0x789, aptos_framework = @aptos_framework)]
+    public fun test_modify_omni_cache_mint(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
+        admin::initialize_for_test(creator);
+        pseudorandom::initialize_for_test(creator);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
+        eigen_shard::initialize_for_test(creator);
+        equipment::initialize_for_test(creator);
+        omni_cache::initialize_for_test(creator);
+
+        // randomness::initialize_for_testing(aptos_framework);
+        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+
+        account::create_account_for_test(@aptos_framework);
+        timestamp::set_time_has_started_for_testing(aptos_framework);
+        block::initialize_for_test(aptos_framework, 5);
+        
+        let _: u64 = timestamp::now_microseconds();
+        let _ = string::utf8(b"First Mint Event");
+        let user1_addr = signer::address_of(user1);
+        let user2_addr = signer::address_of(user2);
+        let user3_addr = signer::address_of(user3);
+        let _ = signer::address_of(creator);
+        
+        timestamp::update_global_time_for_test(1000);
+
+        let equipment_part_id = 1;
+        let affinity_id = 1;
+        let grade = 1;
+        equipment::add_equipment_entry(creator, 
+        string::utf8(b"Equipment Name 1"), 
+        string::utf8(b"Equipment Description 1"),
+        string::utf8(b"Equipment uri 1"),
+        equipment_part_id,
+        affinity_id,
+        grade,
+        100, 10, 11, 12, 50,
+        10, 5, 5, 5, 5);
+        equipment::add_equipment_entry(creator, 
+        string::utf8(b"Equipment Name 2"), 
+        string::utf8(b"Equipment Description 2"),
+        string::utf8(b"Equipment uri 2"),
+        equipment_part_id,
+        affinity_id,
+        grade,
+        100, 10, 11, 12, 50,
+        10, 5, 5, 5, 5);
+        equipment::add_equipment_entry(creator, 
+        string::utf8(b"Equipment Name 3"), 
+        string::utf8(b"Equipment Description 3"),
+        string::utf8(b"Equipment uri 3"),
+        equipment_part_id,
+        affinity_id,
+        grade,
+        100, 10, 11, 12, 50,
+        10, 5, 5, 5, 5);
+        equipment::add_equipment_entry(creator, 
+        string::utf8(b"Equipment Name 4"), 
+        string::utf8(b"Equipment Description 4"),
+        string::utf8(b"Equipment uri 4"),
+        equipment_part_id,
+        affinity_id,
+        grade,
+        100, 10, 11, 12, 50,
+        10, 5, 5, 5, 5);
+
+        omni_cache::add_equipment_to_cache(creator, 0, 0);
+        omni_cache::add_equipment_to_cache(creator, 0, 1);
+        omni_cache::add_equipment_to_cache(creator, 0, 2);
+        omni_cache::add_equipment_to_cache(creator, 1, 3);
+
+
+        omni_cache::add_whitelist_addresses(creator, vector[user1_addr,user2_addr,user3_addr], vector[200,300,400]);
+        omni_cache::modify_special_event_struct(creator, string::utf8(b"Mint Event"),0,10000 );
+        omni_cache::modify_omni_cache_data(creator,1,0,30);
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user1);
+        omni_cache::unlock_cache_via_event(user2);
+        omni_cache::unlock_cache_via_event(user2);
+        omni_cache::unlock_cache_via_event(user2);
+        omni_cache::unlock_cache_via_event(user2);
+        omni_cache::unlock_cache_via_event(user2);
+        omni_cache::unlock_cache_via_event(user2);
+
+    }
+
+    #[test(creator = @main, user1 = @0x456, user2 = @0x678, user3= @0x789, aptos_framework = @aptos_framework)]
     #[expected_failure(abort_code=6, location=main::omni_cache)]
     public fun test_unlock_extra_cache_via_event(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
         admin::initialize_for_test(creator);
@@ -346,6 +588,9 @@ module main::omni_cache_test{
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
+
+        // randomness::initialize_for_testing(aptos_framework);
+        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
@@ -391,6 +636,8 @@ module main::omni_cache_test{
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
+        // randomness::initialize_for_testing(aptos_framework);
+        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
@@ -433,6 +680,8 @@ module main::omni_cache_test{
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
+        // randomness::initialize_for_testing(aptos_framework);
+        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);

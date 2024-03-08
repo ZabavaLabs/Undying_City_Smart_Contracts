@@ -16,14 +16,14 @@ const {
 const yaml = require('js-yaml');
 const fs = require('fs');
 
-const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network.TESTNET;
+const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network.MAINNET;
 
 
 // Path to the CSV file
 const filePath = './data/whitelist_addresses.csv';
-const eventName = "Zabava Genesis Mint";
-const startTime = 0;
-const endTime = 2709651445_000_000;
+const eventName = "Genesis Mint: Unveiling the First Equipment of Undying City!";
+const startTime = 1709906400_000_000;
+const endTime = 1710165600_000_000;
 
 const read_account_data = () => {
     let doc;

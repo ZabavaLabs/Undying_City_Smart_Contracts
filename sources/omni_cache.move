@@ -18,6 +18,7 @@ module main::omni_cache{
     use main::admin::{Self};
     use main::pseudorandom;
     use main::equipment;
+    // use aptos_framework::randomness;
 
 
     #[test_only]
@@ -132,16 +133,21 @@ module main::omni_cache{
         let special_equipment_weight = omni_cache_data.special_equipment_weight;
 
         let random_number = pseudorandom::rand_u64_range(&account_addr, 1, normal_equipment_weight + special_equipment_weight + 1);
+        // let random_number = randomness::u64_range(1, normal_equipment_weight + special_equipment_weight + 1);
         if (random_number <= normal_equipment_weight){
             let normal_equipment_cache_table = &borrow_global<NormalEquipmentCacheData>(@main).table;
             let normal_equipment_cache_table_length:u64 = aptos_std::smart_table::length(normal_equipment_cache_table);
             let row_id = pseudorandom::rand_u64_range(&account_addr, 0, normal_equipment_cache_table_length);
+            // let row_id = randomness::u64_range(0, normal_equipment_cache_table_length);
+
             let random_equipment_id:u64 = *smart_table::borrow(normal_equipment_cache_table, row_id);
             equipment::mint_equipment(account, random_equipment_id);
         } else{
             let special_equipment_cache_table = &borrow_global<SpecialEquipmentCacheData>(@main).table;
             let special_equipment_cache_table_length:u64 = aptos_std::smart_table::length(special_equipment_cache_table);
             let row_id = pseudorandom::rand_u64_range(&account_addr, 0, special_equipment_cache_table_length);
+            // let row_id = randomness::u64_range(0, special_equipment_cache_table_length);
+
             let random_equipment_id:u64 = *smart_table::borrow(special_equipment_cache_table, row_id);
             equipment::mint_equipment(account, random_equipment_id);
         }
@@ -170,16 +176,22 @@ module main::omni_cache{
         let special_equipment_weight = omni_cache_data.special_equipment_weight;
 
         let random_number = pseudorandom::rand_u64_range(&account_addr, 1, normal_equipment_weight + special_equipment_weight + 1);
+        // let random_number = randomness::u64_range(1, normal_equipment_weight + special_equipment_weight + 1);
+        
         if (random_number <= normal_equipment_weight){
             let normal_equipment_cache_table = &borrow_global<NormalEquipmentCacheData>(@main).table;
             let normal_equipment_cache_table_length:u64 = aptos_std::smart_table::length(normal_equipment_cache_table);
             let row_id = pseudorandom::rand_u64_range(&account_addr, 0, normal_equipment_cache_table_length);
+            // let row_id = randomness::u64_range(0, normal_equipment_cache_table_length);
+
             let random_equipment_id:u64 = *smart_table::borrow(normal_equipment_cache_table, row_id);
             equipment::mint_equipment(account, random_equipment_id);
         } else{
             let special_equipment_cache_table = &borrow_global<SpecialEquipmentCacheData>(@main).table;
             let special_equipment_cache_table_length:u64 = aptos_std::smart_table::length(special_equipment_cache_table);
             let row_id = pseudorandom::rand_u64_range(&account_addr, 0, special_equipment_cache_table_length);
+            // let row_id = randomness::u64_range(0, special_equipment_cache_table_length);
+
             let random_equipment_id:u64 = *smart_table::borrow(special_equipment_cache_table, row_id);
             equipment::mint_equipment(account, random_equipment_id);
         }
@@ -219,6 +231,13 @@ module main::omni_cache{
         simple_map::upsert(&mut special_events_info_entry.whitelist_map, modify_address, amount);
     }
 
+    public entry fun add_whitelist_addresses(account:&signer, address_vector:vector<address>, amount_vector: vector<u64>) acquires  SpecialEventsInfoEntry{
+        let account_addr = signer::address_of(account);
+        admin::assert_is_admin(account_addr);
+        let special_events_info_entry = borrow_global_mut<SpecialEventsInfoEntry>(@main);
+        simple_map::add_all(&mut special_events_info_entry.whitelist_map, address_vector, amount_vector);
+    }
+
     public entry fun reset_event_and_add_addresses(account:&signer, name: String, start_time:u64, end_time:u64, address_vector:vector<address>, amount_vector: vector<u64>) acquires  SpecialEventsInfoEntry{
         let account_addr = signer::address_of(account);
         admin::assert_is_admin(account_addr);
@@ -244,6 +263,16 @@ module main::omni_cache{
             // assert!(smart_table::length(special_equipment_cache_table)==0, EINVALID_TABLE_LENGTH);
             smart_table::add_all(special_equipment_cache_table, row_id_vector, equipment_id_vector);
         } 
+    }
+
+    public entry fun modify_omni_cache_data(account:&signer, shards_to_unlock_cache:u64, normal_equipment_weight:u64, special_equipment_weight:u64) acquires OmniCacheData{
+        let account_addr = signer::address_of(account);
+        admin::assert_is_admin(account_addr);
+        let omni_cache_data = borrow_global_mut<OmniCacheData>(@main);
+        omni_cache_data.shards_to_unlock_cache = shards_to_unlock_cache;
+        omni_cache_data.normal_equipment_weight = normal_equipment_weight;
+        omni_cache_data.special_equipment_weight = special_equipment_weight;
+
     }
 
     // ISSUES WITH TABLE STUFF
@@ -347,6 +376,12 @@ module main::omni_cache{
         } else{
             18_446_744_073_709_551_615
         }
+    }
+
+    #[view]
+    public fun get_omni_cache_data():(u64, u64, u64) acquires OmniCacheData{
+        let omni_cache_data = borrow_global<OmniCacheData>(@main);
+        (omni_cache_data.shards_to_unlock_cache, omni_cache_data.normal_equipment_weight, omni_cache_data.special_equipment_weight)
     }
 
     // ANCHOR Test Functions

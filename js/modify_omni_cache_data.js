@@ -27,8 +27,9 @@ const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network
 
 
 // ANCHOR: PARAMETERS TO MODIFY
-const cache_id = 1;
-const filePath = `./data/equipment_to_cache_${cache_id}.csv`;
+const shards_to_unlock_cache = 100;
+const normal_equipment_weight = 95;
+const special_equipment_weight = 5;
 
 async function readCSV(filePath) {
     let data;
@@ -64,7 +65,7 @@ const read_account_data = () => {
     return doc;
 }
 
-const reset_cache_and_add_equipment_ids = async () => {
+const modify_omni_cache_data = async () => {
     // Setup the client
     const config = new AptosConfig({ network: APTOS_NETWORK });
     const sdk = new Aptos(config);
@@ -76,23 +77,20 @@ const reset_cache_and_add_equipment_ids = async () => {
     const main = await Account.fromPrivateKey({ privateKey });
 
     // Call the function with the file path
-    let { headers, rowData } = await readCSV(filePath);
-
-    console.log(`rowData ${rowData}`);
 
     const transaction = await aptos.transaction.build.simple({
         sender: main.accountAddress,
         data: {
-            function: `${account_data.profiles.default.account}::omni_cache::reset_cache_and_add_equipment_ids`,
+            function: `${account_data.profiles.default.account}::omni_cache::modify_omni_cache_data`,
             typeArguments: [],
-            functionArguments: [cache_id, rowData[0], rowData[1]],
+            functionArguments: [shards_to_unlock_cache, normal_equipment_weight, special_equipment_weight],
         },
     });
-    console.log(`Sending add_equipment transaction`);
+    console.log(`Sending modify_omni_cache_data transaction`);
 
     const committedTransaction = await aptos.signAndSubmitTransaction({ signer: main, transaction });
     console.log(`Transaction hash: ${committedTransaction.hash}`);
 
 };
 
-reset_cache_and_add_equipment_ids();
+modify_omni_cache_data();
