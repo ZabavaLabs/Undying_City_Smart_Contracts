@@ -332,7 +332,7 @@ module main::eigen_shard {
     }
 
     #[test_only]
-    public fun setup_coin(creator:&signer, user1:&signer, user2:&signer, aptos_framework: &signer){
+    public fun setup_coin(creator:&signer, user1:&signer, user2:&signer, aptos_framework: &signer, amount: u64){
         use aptos_framework::account::create_account_for_test;
         create_account_for_test(signer::address_of(creator));
         create_account_for_test(signer::address_of(user1));
@@ -346,9 +346,9 @@ module main::eigen_shard {
         // coin::deposit(signer::address_of(user1), coin::mint(10_00_000_000, &mint_cap));
         // coin::deposit(signer::address_of(user2), coin::mint(10_00_000_000, &mint_cap));
 
-        coin::deposit(signer::address_of(creator), coin::mint(1_00_000_000, &mint_cap));
-        coin::deposit(signer::address_of(user1), coin::mint(1_00_000_000, &mint_cap));
-        coin::deposit(signer::address_of(user2), coin::mint(1_00_000_000, &mint_cap));
+        coin::deposit(signer::address_of(creator), coin::mint(amount, &mint_cap));
+        coin::deposit(signer::address_of(user1), coin::mint(amount, &mint_cap));
+        coin::deposit(signer::address_of(user2), coin::mint(amount, &mint_cap));
 
 
         coin::destroy_burn_cap(burn_cap);

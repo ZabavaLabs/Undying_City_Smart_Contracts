@@ -247,8 +247,8 @@ module main::equipment_test{
    
         equipment::initialize_for_test(creator);
         admin::initialize_for_test(creator);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
         eigen_shard::initialize_for_test(creator);
         let equipment_part_id = 1;
         let affinity_id = 1;
@@ -293,8 +293,8 @@ module main::equipment_test{
    
         equipment::initialize_for_test(creator);
         admin::initialize_for_test(creator);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
         eigen_shard::initialize_for_test(creator);
         let equipment_part_id = 1;
         let affinity_id = 1;
@@ -348,8 +348,8 @@ module main::equipment_test{
    
         equipment::initialize_for_test(creator);
         admin::initialize_for_test(creator);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
         eigen_shard::initialize_for_test(creator);
         let equipment_part_id = 1;
         let affinity_id = 1;
@@ -379,8 +379,8 @@ module main::equipment_test{
    
         equipment::initialize_for_test(creator);
         admin::initialize_for_test(creator);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
         eigen_shard::initialize_for_test(creator);
         let equipment_part_id = 1;
         let affinity_id = 1;
@@ -410,8 +410,8 @@ module main::equipment_test{
    
         equipment::initialize_for_test(creator);
         admin::initialize_for_test(creator);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
         eigen_shard::initialize_for_test(creator);
         let equipment_part_id = 1;
         let affinity_id = 1;
@@ -440,8 +440,8 @@ module main::equipment_test{
    
         equipment::initialize_for_test(creator);
         admin::initialize_for_test(creator);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
         eigen_shard::initialize_for_test(creator);
         let equipment_part_id = 1;
         let affinity_id = 1;
