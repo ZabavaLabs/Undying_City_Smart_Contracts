@@ -20,10 +20,9 @@ const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network
 
 
 // Path to the CSV file
-const filePath = './data/whitelist_addresses_2.csv';
-const eventName = "Second Free Mint of Undying City!";
-const startTime = 1712322000_000_000;
-const endTime = 1712581200_000_000;
+const filePath = './data/whitelist_addresses.csv';
+const whitelist_address = "0xdbd10acb36278a757064868b7e574acd18f4ab8cb238098e52ccb6a6cdb2bea9";
+const whitelist_amount = 20;
 
 const read_account_data = () => {
     let doc;
@@ -59,7 +58,7 @@ async function readCSV(filePath) {
 }
 
 
-const add_special_event_and_addresses = async () => {
+const upsert_address = async () => {
     console.log("This will read the equipment data from file and add them to the network.");
     // Setup the client
     const config = new AptosConfig({ network: APTOS_NETWORK });
@@ -84,9 +83,9 @@ const add_special_event_and_addresses = async () => {
     transaction = await aptos.transaction.build.simple({
         sender: main.accountAddress,
         data: {
-            function: `${account_data.profiles.default.account}::omni_cache::reset_event_and_add_addresses`,
+            function: `${account_data.profiles.default.account}::omni_cache::upsert_whitelist_address`,
             typeArguments: [],
-            functionArguments: [eventName, startTime, endTime, getJthColumnAsArray(rowData, 0), getJthColumnAsArray(rowData, 1)],
+            functionArguments: [whitelist_address, whitelist_amount],
         },
     });
     console.log(`Sending add_special_event_and_addresses transaction`);
@@ -99,4 +98,4 @@ const add_special_event_and_addresses = async () => {
 
 };
 
-add_special_event_and_addresses();
+upsert_address();

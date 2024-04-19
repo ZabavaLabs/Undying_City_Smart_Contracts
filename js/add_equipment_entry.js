@@ -23,11 +23,11 @@ const COIN_STORE = `0x1::coin::CoinStore<${APTOS_COIN}>`;
 const ALICE_INITIAL_BALANCE = 100_000_000;
 const BOB_INITIAL_BALANCE = 100;
 const TRANSFER_AMOUNT = 100;
-const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network.MAINNET;
+const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network.TESTNET;
 
 
 // Path to the CSV file
-const filePath = './data/equipment_data.csv';
+const filePath = './data/new_equipment_data.tsv';
 
 async function readCSV(filePath) {
     let data;
@@ -42,8 +42,8 @@ async function readCSV(filePath) {
         const rows = data.split('\n');
 
         // Process each row (assuming the first row contains headers)
-        headers = rows[0].split(',');
-        rowsData = rows.slice(1).map(row => row.split(','));
+        headers = rows[0].split('\t');
+        rowsData = rows.slice(1).map(row => row.split('\t'));
         newRowsData = rowsData.map(row => row.slice(1).map(cell => cell.trim()));
 
         // console.log('Headers:', headers);
@@ -54,25 +54,6 @@ async function readCSV(filePath) {
     return { headers, rowData: newRowsData };
 }
 
-
-
-
-/**
- * Prints the balance of an account
- * @param aptos
- * @param name
- * @param address
- * @returns {Promise<*>}
- *
- */
-const balance = async (sdk, name, address) => {
-    let balance = await sdk.getAccountResource({ accountAddress: address, resourceType: COIN_STORE });
-
-    let amount = Number(balance.coin.value);
-
-    console.log(`${name}'s balance is: ${amount}`);
-    return amount;
-};
 
 const read_account_data = () => {
     let doc;
@@ -99,15 +80,25 @@ const add_equipment = async () => {
 
     console.log("=== Addresses ===\n");
     console.log(`Main's address is: ${main.accountAddress}`);
-    console.log(`Bob's address is: ${bob.accountAddress}`);
-
 
     // Call the function with the file path
     let { headers, rowData } = await readCSV(filePath);
 
     let transaction;
     let committedTransaction;
-    console.log(`rowData ${rowData}`);
+    // console.log(`rowData:`);
+    // console.log(`${rowData[0][0]}`);
+    // console.log(`${rowData[0][1]}`);
+    // console.log(`${rowData[0][2]}`);
+    // console.log(`${rowData[0][3]}`);
+    // console.log(`${rowData[0][4]}`);
+    // console.log(`${rowData[0][5]}`);
+    // console.log(`${rowData[0][6]}`);
+    // console.log(`${rowData[0][7]}`);
+    // console.log(`${rowData[0][8]}`);
+    // console.log(`length ${rowData[0].length}`);
+    // console.log(`Cols ${rowData.length}`);
+
     for (let i = 0; i < rowData.length; i++) {
         transaction = await aptos.transaction.build.simple({
             sender: main.accountAddress,
@@ -128,55 +119,6 @@ const add_equipment = async () => {
         }
     }
 
-    // Fund the accounts
-    // console.log("\n=== Funding accounts ===\n");
-
-    // const aliceFundTxn = await sdk.fundAccount({
-    //     accountAddress: main.accountAddress,
-    //     amount: ALICE_INITIAL_BALANCE,
-    // });
-    // console.log("Main's fund transaction: ", aliceFundTxn);
-
-    // const bobFundTxn = await sdk.fundAccount({
-    //     accountAddress: bob.accountAddress,
-    //     amount: BOB_INITIAL_BALANCE,
-    // });
-    // console.log("Bob's fund transaction: ", bobFundTxn);
-
-    // // Show the balances
-    // console.log("\n=== Balances ===\n");
-    // let mainBalance = await balance(sdk, "Main", main.accountAddress);
-    // let bobBalance = await balance(sdk, "Bob", bob.accountAddress);
-
-    // if (mainBalance !== ALICE_INITIAL_BALANCE) throw new Error("Main's balance is incorrect");
-    // if (bobBalance !== BOB_INITIAL_BALANCE) throw new Error("Bob's balance is incorrect");
-
-    // Transfer between users
-    // const txn = await sdk.transaction.build.simple({
-    //     sender: alice.accountAddress,
-    //     data: {
-    //         function: "0x1::coin::transfer",
-    //         typeArguments: [parseTypeTag(APTOS_COIN)],
-    //         functionArguments: [AccountAddress.from(bob.accountAddress), new U64(TRANSFER_AMOUNT)],
-    //     },
-    // });
-
-    // console.log("\n=== Transfer transaction ===\n");
-    // let committedTxn = await sdk.signAndSubmitTransaction({ signer: alice, transaction: txn });
-    // console.log(`Committed transaction: ${committedTxn.hash}`);
-    // await sdk.waitForTransaction({ transactionHash: committedTxn.hash });
-
-    // console.log("\n=== Balances after transfer ===\n");
-    // let newAliceBalance = await balance(sdk, "Alice", alice.accountAddress);
-    // let newBobBalance = await balance(sdk, "Bob", bob.accountAddress);
-
-    // // Bob should have the transfer amount
-    // if (newBobBalance !== TRANSFER_AMOUNT + BOB_INITIAL_BALANCE)
-    //     throw new Error("Bob's balance after transfer is incorrect");
-
-    // // Alice should have the remainder minus gas
-    // if (newAliceBalance >= ALICE_INITIAL_BALANCE - TRANSFER_AMOUNT)
-    //     throw new Error("Alice's balance after transfer is incorrect");
 };
 
 add_equipment();
