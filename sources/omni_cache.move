@@ -132,7 +132,10 @@ module main::omni_cache{
 
    public(friend) entry fun unlock_cache_10x(account:&signer) acquires OmniCacheData, SpecialEquipmentCacheData, NormalEquipmentCacheData{
         let omni_cache_data = borrow_global<OmniCacheData>(@main);
-        let shards_spend = omni_cache_data.shards_to_unlock_cache * 10 - 120;
+        // TODO: Temporary adjust this to 20 for testing. Final should be 880
+        // let shards_spend = 20;
+        let shards_spend = omni_cache_data.shards_to_unlock_cache * 10 - 120; 
+
         let shard_object = object::address_to_object(eigen_shard::shard_token_address());
         eigen_shard::burn_shard(account, shard_object, shards_spend);
         for (i in 0..10) {

@@ -338,6 +338,7 @@ module main::eigen_shard {
         create_account_for_test(signer::address_of(user1));
         create_account_for_test(signer::address_of(user2));
 
+        // let (burn_cap, freeze_cap, mint_cap) = initialize_and_register_fake_money(creator, 1, true);
         let (burn_cap, mint_cap) = aptos_framework::aptos_coin::initialize_for_test(aptos_framework);
         coin::register<AptosCoin>(creator);
         coin::register<AptosCoin>(user1);

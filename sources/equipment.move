@@ -91,6 +91,18 @@ module main::equipment{
         collection_mutator_ref: collection::MutatorRef
     }
 
+    #[event]
+    struct EquipmentMintEvent has drop, store {
+        receiver: address,
+        token_address: address, 
+        equipment_id: u64,
+        name: String,
+        uri: String,
+        equipment_part_id: u64,
+        affinity_id: u64,
+        grade: u64,
+    }
+
 
     const APP_SIGNER_CAPABILITY_SEED: vector<u8> = b"APP_SIGNER_CAPABILITY";
     const BURN_SIGNER_CAPABILITY_SEED: vector<u8> = b"BURN_SIGNER_CAPABILITY";
@@ -172,7 +184,7 @@ module main::equipment{
         assert!(equipment_id_exists(equipment_id), ECHAR_ID_NOT_FOUND);
         let equipment_info_entry = get_equipment_info_entry(equipment_id);        
         let level = 1;
-        create_equipment(user, 
+        let equipment_token = create_equipment(user, 
         equipment_id, equipment_info_entry.name, 
         equipment_info_entry.description, equipment_info_entry.uri, 
         equipment_info_entry.equipment_part_id, equipment_info_entry.affinity_id,
@@ -184,6 +196,31 @@ module main::equipment{
         equipment_info_entry.growth_atk, equipment_info_entry.growth_def,
         equipment_info_entry.growth_atk_spd, equipment_info_entry.growth_mv_spd
         );
+        let address = signer::address_of(user);
+        let event = EquipmentMintEvent {
+            receiver: address,
+            token_address: object::object_address(&equipment_token), 
+            equipment_id: equipment_id,
+            name: equipment_info_entry.name,
+            uri: equipment_info_entry.uri,
+            equipment_part_id: equipment_info_entry.equipment_part_id,
+            affinity_id: equipment_info_entry.affinity_id,
+            grade: equipment_info_entry.grade,
+            // level: level,
+            // hp: equipment_info_entry.hp,
+            // atk: equipment_info_entry.atk,
+            // def: equipment_info_entry.def,
+            // atk_spd: equipment_info_entry.atk_spd,
+            // mv_spd: equipment_info_entry.mv_spd,
+            // growth_hp: equipment_info_entry.growth_hp,
+            // growth_atk: equipment_info_entry.growth_atk,
+            // growth_def: equipment_info_entry.growth_def,
+            // growth_atk_spd: equipment_info_entry.growth_atk_spd,
+            // growth_mv_spd: equipment_info_entry.growth_mv_spd,
+        };
+     
+        0x1::event::emit(event);
+  
     }
 
     fun create_equipment(
