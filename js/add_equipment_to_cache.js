@@ -23,37 +23,14 @@ const COIN_STORE = `0x1::coin::CoinStore<${APTOS_COIN}>`;
 const ALICE_INITIAL_BALANCE = 100_000_000;
 const BOB_INITIAL_BALANCE = 100;
 const TRANSFER_AMOUNT = 100;
-const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network.TESTNET;
+const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network.MAINNET;
 
 
 // ANCHOR: PARAMETERS TO MODIFY
-const cache_id = 1;
-const start_index = 12;
-const end_index = 17;
+const cache_id = 0;
+const start_equipment_id = 24;
+const end_equipment_id_inclusive = 29;
 const filePath = `./data/equipment_to_cache_${cache_id}.csv`;
-
-async function readCSV(filePath) {
-    let data;
-    let headers;
-    let rowsData;
-    let newRowsData;
-    try {
-        // Read the CSV file
-        data = await fs.promises.readFile(filePath, 'utf8');
-
-        // Split the CSV data into rows
-        const rows = data.split('\n');
-
-        // Process each row (assuming the first row contains headers)
-        // headers = rows[0].split(',');
-        rowsData = rows.map(row => row.split(','));
-        newRowsData = rowsData.map(row => row.slice(1).map(cell => cell.trim()));
-
-    } catch (err) {
-        console.error('Error reading the file:', err);
-    }
-    return { rowData: newRowsData };
-}
 
 
 const read_account_data = () => {
@@ -81,7 +58,7 @@ const add_equipment_to_cache = async () => {
     // let { headers, rowData } = await readCSV(filePath);
 
     // console.log(`rowData ${rowData}`);
-    for (let i = start_index; i <= end_index; i++) {
+    for (let i = start_equipment_id; i <= end_equipment_id_inclusive; i++) {
         const transaction = await aptos.transaction.build.simple({
             sender: main.accountAddress,
             data: {

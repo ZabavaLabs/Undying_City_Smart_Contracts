@@ -130,7 +130,7 @@ module main::omni_cache{
         random_mint(account);
     }
 
-   public(friend) entry fun unlock_cache_10x(account:&signer) acquires OmniCacheData, SpecialEquipmentCacheData, NormalEquipmentCacheData{
+    public(friend) entry fun unlock_cache_10x(account:&signer) acquires OmniCacheData, SpecialEquipmentCacheData, NormalEquipmentCacheData{
         let omni_cache_data = borrow_global<OmniCacheData>(@main);
         // TODO: Temporary adjust this to 20 for testing. Final should be 880
         // let shards_spend = 20;

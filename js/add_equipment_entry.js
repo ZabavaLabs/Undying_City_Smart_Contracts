@@ -23,13 +23,13 @@ const COIN_STORE = `0x1::coin::CoinStore<${APTOS_COIN}>`;
 const ALICE_INITIAL_BALANCE = 100_000_000;
 const BOB_INITIAL_BALANCE = 100;
 const TRANSFER_AMOUNT = 100;
-const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network.TESTNET;
+const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network.MAINNET;
 
 
 // Path to the CSV file
 const filePath = './data/new_equipment_data.tsv';
 
-async function readCSV(filePath) {
+async function readTSV(filePath) {
     let data;
     let headers;
     let rowsData;
@@ -76,13 +76,12 @@ const add_equipment = async () => {
     let account_data = read_account_data();
     const privateKey = new Ed25519PrivateKey(account_data.profiles.default.private_key);
     const main = await Account.fromPrivateKey({ privateKey });
-    let bob = Account.generate({ scheme: 0 });
 
     console.log("=== Addresses ===\n");
     console.log(`Main's address is: ${main.accountAddress}`);
 
     // Call the function with the file path
-    let { headers, rowData } = await readCSV(filePath);
+    let { headers, rowData } = await readTSV(filePath);
 
     let transaction;
     let committedTransaction;
