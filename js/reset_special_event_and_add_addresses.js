@@ -16,17 +16,18 @@ const {
 const yaml = require('js-yaml');
 const fs = require('fs');
 
-const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network.TESTNET;
+const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network.MAINNET;
 
 
 // Path to the CSV file
-const filePath = './data/whitelist_addresses_5_test.csv';
+const filePath = './data/whitelist_addresses_5.csv';
 const eventName = "Third Free Mint of Undying City!";
-const startTime = 1714614245_000_000;
+// const startTime = 1714614245_000_000;
 // Friday 3rd May 10:30 PM SGT
-// const startTime = 1714746600_000_000;
+const startTime = 1714744800_000_000;
+
 // Wednesday 8th May 10:30 PM SGT
-const endTime = 1715178600_000_000;
+const endTime = 1715176800_000_000;
 
 const read_account_data = () => {
     let doc;

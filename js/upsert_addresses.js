@@ -20,9 +20,7 @@ const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network
 
 
 // Path to the CSV file
-const filePath = './data/whitelist_addresses.csv';
-const whitelist_address = "0xdbd10acb36278a757064868b7e574acd18f4ab8cb238098e52ccb6a6cdb2bea9";
-const whitelist_amount = 20;
+const filePath = './data/whitelist_addresses_5.csv';
 
 const read_account_data = () => {
     let doc;
@@ -58,7 +56,7 @@ async function readCSV(filePath) {
 }
 
 
-const upsert_address = async () => {
+const upsert_addresses = async () => {
     console.log("This will read the equipment data from file and add them to the network.");
     // Setup the client
     const config = new AptosConfig({ network: APTOS_NETWORK });
@@ -70,32 +68,32 @@ const upsert_address = async () => {
     const privateKey = new Ed25519PrivateKey(account_data.profiles.default.private_key);
     const main = await Account.fromPrivateKey({ privateKey });
 
-
-    console.log(`Main's address is: ${main.accountAddress}`);
-
     // Call the function with the file path
     let { rowData } = await readCSV(filePath);
 
     let transaction;
     let committedTransaction;
-    console.log(`rowData ${rowData}`);
 
-    transaction = await aptos.transaction.build.simple({
-        sender: main.accountAddress,
-        data: {
-            function: `${account_data.profiles.default.account}::omni_cache::upsert_whitelist_address`,
-            typeArguments: [],
-            functionArguments: [whitelist_address, whitelist_amount],
-        },
-    });
-    console.log(`Sending add_special_event_and_addresses transaction`);
+    for (let i = 0; i < rowData.length; i++) {
+        transaction = await aptos.transaction.build.simple({
+            sender: main.accountAddress,
+            data: {
+                function: `${account_data.profiles.default.account}::omni_cache::upsert_whitelist_address`,
+                typeArguments: [],
+                functionArguments: [rowData[i][0], rowData[i][1]],
+            },
+        });
+        console.log(`Upsert Whitelist Address ${rowData[i][0]}`);
 
-    committedTransaction = await aptos.signAndSubmitTransaction({ signer: main, transaction });
-    console.log(`Transaction hash: ${committedTransaction.hash}`);
-    const status = await aptos.waitForTransaction({ transactionHash: committedTransaction.hash })
-    console.log(`Transaction status: ${status.success}`);
-
+        committedTransaction = await aptos.signAndSubmitTransaction({ signer: main, transaction });
+        console.log(`Transaction hash: ${committedTransaction.hash}`);
+        const status = await aptos.waitForTransaction({ transactionHash: committedTransaction.hash })
+        if (!status.success) {
+            console.log(`Transaction failed at: ${i}`);
+            break;
+        }
+    }
 
 };
 
-upsert_address();
+upsert_addresses();

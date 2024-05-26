@@ -362,17 +362,18 @@ module main::equipment{
    
     public(friend) entry fun upgrade_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, amount: u64) acquires EquipmentCapability,  EquipmentData {
         assert!(object::is_owner(equipment_object, signer::address_of(from)), ENOT_OWNER);
+        assert!(amount>0, EINVALID_PROPERTY_VALUE);
         let collection = token::collection_object(equipment_object);
         assert!(object::object_address(&collection) == equipment_collection_address(), EINVALID_COLLECTION);
         let shard_object = object::address_to_object(eigen_shard::shard_token_address());
-        eigen_shard::burn_shard(from, shard_object, amount);
         let equipment_token_address = object::object_address(&equipment_object);
         let equipment = borrow_global_mut<EquipmentCapability>(equipment_token_address);
         // Gets `property_mutator_ref` to update the attack point in the property map.
         let property_mutator_ref = &equipment.property_mutator_ref;
         // Updates the attack point in the property map.
         let current_lvl = property_map::read_u64(&equipment_object, &string::utf8(b"LEVEL"));
-
+        let cost = 10/2 * amount * (current_lvl + current_lvl + amount -1);
+        eigen_shard::burn_shard(from, shard_object, cost);
         // Prevents upgrading beyond a certain level.
         let game_data = borrow_global< EquipmentData>(equipment_collection_address());
         assert!( current_lvl + amount <= game_data.max_equipment_level, EMAX_LEVEL);

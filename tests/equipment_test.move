@@ -266,17 +266,17 @@ module main::equipment_test{
             10, 5, 5, 5, 5);
 
         let user1_addr = signer::address_of(user1);
-        eigen_shard::mint_shard(user1, 10);
+        eigen_shard::mint_shard(user1, 300);
 
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
         let shard_balance = eigen_shard::shard_balance(user1_addr);
 
-        assert!(shard_balance == 10, 0);
+        assert!(shard_balance == 300, 0);
 
         equipment::upgrade_equipment(user1, char1, 6);
 
-        assert!(eigen_shard::shard_balance(user1_addr) == 4, EINVALID_BALANCE);
+        assert!(eigen_shard::shard_balance(user1_addr) == 90, EINVALID_BALANCE);
 
         assert!(property_map::read_u64(&char1, &string::utf8(b"LEVEL"))==7, EINVALID_PROPERTY_VALUE);
         assert!(property_map::read_u64(&char1, &string::utf8(b"GROWTH_HP"))==10, EINVALID_PROPERTY_VALUE);
@@ -312,16 +312,16 @@ module main::equipment_test{
             10, 5, 6, 7, 8);
 
         let user1_addr = signer::address_of(user1);
-        eigen_shard::mint_shard(user1, 20);
+        eigen_shard::mint_shard(user1, 100);
 
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
 
-        assert!(eigen_shard::shard_balance(user1_addr) == 20, 0);
+        assert!(eigen_shard::shard_balance(user1_addr) == 100, 0);
 
         equipment::upgrade_equipment(user1, char1, 1);
 
-        assert!(eigen_shard::shard_balance(user1_addr) == 19, EINVALID_BALANCE);
+        assert!(eigen_shard::shard_balance(user1_addr) == 90, EINVALID_BALANCE);
 
         assert!(property_map::read_u64(&char1, &string::utf8(b"LEVEL"))==2, EINVALID_PROPERTY_VALUE);
         assert!(property_map::read_u64(&char1, &string::utf8(b"HP"))==110, EINVALID_PROPERTY_VALUE);
@@ -379,7 +379,7 @@ module main::equipment_test{
    
         equipment::initialize_for_test(creator);
         admin::initialize_for_test(creator);
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000_000_000);
 
         eigen_shard::initialize_for_test(creator);
         let equipment_part_id = 1;
@@ -397,7 +397,7 @@ module main::equipment_test{
             100, 10, 11, 12, 50,
             10, 5, 5, 5, 5);
 
-        eigen_shard::mint_shard(user1, 100);
+        eigen_shard::mint_shard(user1, 20000);
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
 
@@ -410,7 +410,7 @@ module main::equipment_test{
    
         equipment::initialize_for_test(creator);
         admin::initialize_for_test(creator);
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000_000_000);
 
         eigen_shard::initialize_for_test(creator);
         let equipment_part_id = 1;
@@ -428,7 +428,7 @@ module main::equipment_test{
             100, 10, 11, 12, 50,
             10, 5, 5, 5, 5);
 
-        eigen_shard::mint_shard(user1, 100);
+        eigen_shard::mint_shard(user1, 20000);
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
 
@@ -440,7 +440,7 @@ module main::equipment_test{
    
         equipment::initialize_for_test(creator);
         admin::initialize_for_test(creator);
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000_000_000);
 
         eigen_shard::initialize_for_test(creator);
         let equipment_part_id = 1;
@@ -459,7 +459,7 @@ module main::equipment_test{
             10, 5, 5, 5, 5);
 
         let user1_addr = signer::address_of(user1);
-        eigen_shard::mint_shard(user1, 100);
+        eigen_shard::mint_shard(user1, 9000000);
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
         let _ = eigen_shard::shard_balance(user1_addr);

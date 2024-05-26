@@ -21,6 +21,13 @@ const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network
 
 // Path to the CSV file
 const filePath = './data/whitelist_addresses_5.csv';
+const eventName = "Third Free Mint of Undying City!";
+// const startTime = 1714614245_000_000;
+// Friday 3rd May 10:00 PM SGT
+const startTime = 1714744800_000_000;
+
+// Wednesday 8th May 10:00 PM SGT
+const endTime = 1715176800_000_000;
 
 const read_account_data = () => {
     let doc;
@@ -56,7 +63,7 @@ async function readCSV(filePath) {
 }
 
 
-const add_addresses = async () => {
+const modify_special_event = async () => {
     console.log("This will read the equipment data from file and add them to the network.");
     // Setup the client
     const config = new AptosConfig({ network: APTOS_NETWORK });
@@ -81,12 +88,12 @@ const add_addresses = async () => {
     transaction = await aptos.transaction.build.simple({
         sender: main.accountAddress,
         data: {
-            function: `${account_data.profiles.default.account}::omni_cache::add_whitelist_addresses`,
+            function: `${account_data.profiles.default.account}::omni_cache::modify_special_event_struct`,
             typeArguments: [],
-            functionArguments: [getJthColumnAsArray(rowData, 0), getJthColumnAsArray(rowData, 1)],
+            functionArguments: [eventName, startTime, endTime],
         },
     });
-    console.log(`Sending add_addresses transaction`);
+    console.log(`Sending modify_special_event_struct transaction`);
 
     committedTransaction = await aptos.signAndSubmitTransaction({ signer: main, transaction });
     console.log(`Transaction hash: ${committedTransaction.hash}`);
@@ -96,4 +103,4 @@ const add_addresses = async () => {
 
 };
 
-add_addresses();
+modify_special_event();
