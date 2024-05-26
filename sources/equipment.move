@@ -360,7 +360,7 @@ module main::equipment{
         object::address_to_object(signer::address_of(&token_signer))
     }
    
-    public(friend) entry fun upgrade_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, amount: u64) acquires EquipmentCapability,  EquipmentData {
+    public entry fun upgrade_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, amount: u64) acquires EquipmentCapability,  EquipmentData {
         assert!(object::is_owner(equipment_object, signer::address_of(from)), ENOT_OWNER);
         assert!(amount>0, EINVALID_PROPERTY_VALUE);
         let collection = token::collection_object(equipment_object);
@@ -396,7 +396,6 @@ module main::equipment{
         property_map::update_typed(property_mutator_ref, &string::utf8(b"DEF"), current_def + (amount * growth_def));
         property_map::update_typed(property_mutator_ref, &string::utf8(b"ATK_SPD"), current_atk_spd + (amount * growth_atk_spd));
         property_map::update_typed(property_mutator_ref, &string::utf8(b"MV_SPD"), current_mv_spd + (amount * growth_mv_spd));
-
     }
     
     // TODO: Test this function
