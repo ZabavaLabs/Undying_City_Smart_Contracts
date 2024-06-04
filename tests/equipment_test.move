@@ -3,6 +3,8 @@ module main::equipment_test{
     use aptos_framework::object::{Self};
 
     use aptos_token_objects::collection;
+    use aptos_token_objects::token;
+
     use aptos_token_objects::property_map::{Self};
 
     // use aptos_framework::fungible_asset::{Self, Metadata};
@@ -18,7 +20,7 @@ module main::equipment_test{
     use main::eigen_shard::{Self, EigenShardCapability};
 
     use main::admin::{Self, ENOT_ADMIN};
-    use main::equipment::{Self, EquipmentCollectionCapability, ResourceCapability, EquipmentInfo};
+    use main::equipment::{Self, EquipmentCollectionCapability, ResourceCapability, EquipmentInfo, EquipmentCapability};
     // use std::debug::print;
     // use std::vector;
 
@@ -505,5 +507,82 @@ module main::equipment_test{
         let new_description = string::utf8(b"This is a new description!!!");
         equipment::set_collection_description(creator, new_description);
         assert!(collection::description(equipment_collection_capability)==new_description,EINVALID_DATA);
+    }
+
+    #[test(creator = @main, user1 = @0x456, user2 = @0x789, aptos_framework = @aptos_framework)]
+    public fun test_enhance_equipment (creator: &signer, user1: &signer, user2: &signer, aptos_framework: &signer) {       
+        equipment::initialize_for_test(creator);
+        admin::initialize_for_test(creator);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000_000_000);
+        equipment::init_upgrade_equipment_capability(creator);
+        eigen_shard::initialize_for_test(creator);
+        let equipment_part_id = 1;
+        let affinity_id = 1;
+        let grade = 1;
+        let level = 1;
+
+        let equip1 = equipment::create_equipment_for_test(user1, 0,  
+            string::utf8(b"Equipment Name"), 
+            string::utf8(b"Equipment Description"),
+            string::utf8(b"Equipment Uri"),
+            equipment_part_id,
+            affinity_id,
+            grade, level,
+            100, 10, 11, 12, 50,
+            10, 5, 5, 5, 5);
+        
+        let equip2 = equipment::create_equipment_for_test(user1, 0,  
+            string::utf8(b"Equipment Name"), 
+            string::utf8(b"Equipment Description"),
+            string::utf8(b"Equipment Uri"),
+            equipment_part_id,
+            affinity_id,
+            grade, level,
+            100, 10, 11, 12, 50,
+            10, 5, 5, 5, 5);
+        
+        let equip3 = equipment::create_equipment_for_test(user1, 0,  
+            string::utf8(b"Equipment Name"), 
+            string::utf8(b"Equipment Description"),
+            string::utf8(b"Equipment Uri"),
+            equipment_part_id,
+            affinity_id,
+            grade, level,
+            100, 10, 11, 12, 50,
+            10, 5, 5, 5, 5);
+                    
+        let equip4 = equipment::create_equipment_for_test(user1, 0,  
+            string::utf8(b"Equipment Name"), 
+            string::utf8(b"Equipment Description"),
+            string::utf8(b"Equipment Uri"),
+            equipment_part_id,
+            affinity_id,
+            grade, level,
+            100, 10, 11, 12, 50,
+            10, 5, 5, 5, 5);
+
+        let user1_addr = signer::address_of(user1);
+        eigen_shard::mint_shard(user1, 100000);
+        assert!(token::uri(equip1)==string::utf8(b"Equipment Uri"), EINVALID_PROPERTY_VALUE);
+
+        let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
+        let new_uri = string::utf8(b"NEW URL");
+        equipment::set_equipment_upgrade_info(creator, 0, 2,  new_uri);
+        equipment::enhance_equipment(user1, equip1, equip2);
+        let shard_balance = eigen_shard::shard_balance(user1_addr);
+        assert!(shard_balance == 99700, 0);
+        assert!(property_map::read_u64(&equip1, &string::utf8(b"GRADE"))==2, EINVALID_PROPERTY_VALUE);
+        assert!(!object::is_object(object::object_address(&equip2)), ENOT_OWNER);
+        assert!(token::uri(equip1)==new_uri, EINVALID_PROPERTY_VALUE);
+        
+        
+        let new_uri_3 = string::utf8(b"NEW URL 3");
+        equipment::set_equipment_upgrade_info(creator, 0, 3,  new_uri_3);
+        equipment::enhance_equipment(user1, equip3, equip4);
+        equipment::enhance_equipment(user1, equip1, equip3);
+        assert!(token::uri(equip1)==new_uri_3, EINVALID_PROPERTY_VALUE);
+        assert!(property_map::read_u64(&equip1, &string::utf8(b"GRADE"))==3, EINVALID_PROPERTY_VALUE);
+
+
     }
 }
