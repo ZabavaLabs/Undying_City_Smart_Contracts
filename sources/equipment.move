@@ -85,7 +85,7 @@ module main::equipment{
     }
 
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
-    struct EquipmentUpgradeInfo has key {
+    struct EquipmentEnhanceInfo has key {
         map: SimpleMap<String, String>
     }
 
@@ -165,7 +165,7 @@ module main::equipment{
         admin::assert_is_admin(caller_address);
         let (object_signer, signer_cap) = account::create_resource_account(account,UC_EQUIPMENT_UPGRADE_SEED);
 
-        move_to(&object_signer, EquipmentUpgradeInfo {
+        move_to(&object_signer, EquipmentEnhanceInfo {
             map: simple_map::new(),
         });
     }
@@ -420,7 +420,7 @@ module main::equipment{
         property_map::update_typed(property_mutator_ref, &string::utf8(b"MV_SPD"), current_mv_spd + (amount * growth_mv_spd));
     }
 
-    public(friend) entry fun enhance_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, equipment_object_to_destroy: Object<EquipmentCapability>) acquires EquipmentCapability, EquipmentUpgradeInfo {
+    public(friend) entry fun enhance_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, equipment_object_to_destroy: Object<EquipmentCapability>) acquires EquipmentCapability, EquipmentEnhanceInfo {
         assert!(object::is_owner(equipment_object, signer::address_of(from)), ENOT_OWNER);
         assert!(object::is_owner(equipment_object_to_destroy, signer::address_of(from)), ENOT_OWNER);
         
@@ -473,7 +473,7 @@ module main::equipment{
         property_map::update_typed(property_mutator_ref, &string::utf8(b"MV_SPD"), current_mv_spd + (amount * growth_mv_spd));
         property_map::update_typed(property_mutator_ref, &string::utf8(b"GRADE"), current_grade + 1);
 
-        let equipment_upgrade_info = borrow_global_mut<EquipmentUpgradeInfo>(equipment_upgrade_info_address());
+        let equipment_upgrade_info = borrow_global_mut<EquipmentEnhanceInfo>(equipment_upgrade_info_address());
         let equipment_upgrade_map = equipment_upgrade_info.map;
         let equipment_id = property_map::read_u64(&equipment_object, &string::utf8(b"EQUIPMENT_ID"));
         let next_grade = current_grade + 1;
@@ -625,16 +625,16 @@ module main::equipment{
         smart_table::clear(equipment_info_table);
     }
 
-     public entry fun set_equipment_upgrade_info(
+    public entry fun set_equipment_upgrade_info(
         account: &signer, 
         equipment_id: u64,
         grade: u64,
         new_url: String
-        ) acquires EquipmentUpgradeInfo {
+        ) acquires EquipmentEnhanceInfo {
 
         admin::assert_is_admin(signer::address_of(account));
 
-        let equipment_upgrade_info_map = &mut borrow_global_mut<EquipmentUpgradeInfo>(equipment_upgrade_info_address()).map;
+        let equipment_upgrade_info_map = &mut borrow_global_mut<EquipmentEnhanceInfo>(equipment_upgrade_info_address()).map;
        
         let equipment_bytes = bcs::to_bytes(&equipment_id);
         let grade_bytes = bcs::to_bytes(&grade);
@@ -643,6 +643,25 @@ module main::equipment{
         string::append(&mut key_string, string::utf8(b"_"));
         string::append(&mut key_string, string::utf8(grade_bytes));
         simple_map::upsert(equipment_upgrade_info_map, key_string, new_url);
+    }
+
+    public entry fun remove_equipment_upgrade_info(
+        account: &signer, 
+        equipment_id: u64,
+        grade: u64
+        ) acquires EquipmentEnhanceInfo {
+
+        admin::assert_is_admin(signer::address_of(account));
+
+        let equipment_upgrade_info_map = &mut borrow_global_mut<EquipmentEnhanceInfo>(equipment_upgrade_info_address()).map;
+       
+        let equipment_bytes = bcs::to_bytes(&equipment_id);
+        let grade_bytes = bcs::to_bytes(&grade);
+
+        let key_string = string::utf8(equipment_bytes);
+        string::append(&mut key_string, string::utf8(b"_"));
+        string::append(&mut key_string, string::utf8(grade_bytes));
+        simple_map::remove(equipment_upgrade_info_map, &key_string);
     }
 
     // ANCHOR Aptos View Functions
