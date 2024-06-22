@@ -113,6 +113,18 @@ module main::equipment{
         grade: u64,
     }
 
+    #[event]
+    struct EquipmentEnhanceEvent has drop, store {
+        token_address: address, 
+        equipment_id: u64,
+        uri: String,
+        grade: u64,
+        hp: u64,
+        atk: u64,
+        def: u64,
+        atk_spd: u64,
+        mv_spd: u64
+    }
 
     const APP_SIGNER_CAPABILITY_SEED: vector<u8> = b"APP_SIGNER_CAPABILITY";
     const BURN_SIGNER_CAPABILITY_SEED: vector<u8> = b"BURN_SIGNER_CAPABILITY";
@@ -160,10 +172,10 @@ module main::equipment{
         move_to(&collection_signer, gameData);
     }
 
-    public(friend) fun init_upgrade_equipment_capability(account: &signer) {
+    public(friend) entry fun init_upgrade_equipment_capability(account: &signer) {
         let caller_address = signer::address_of(account);
         admin::assert_is_admin(caller_address);
-        let (object_signer, signer_cap) = account::create_resource_account(account,UC_EQUIPMENT_UPGRADE_SEED);
+        let (object_signer, signer_cap) = account::create_resource_account(account, UC_EQUIPMENT_UPGRADE_SEED);
 
         move_to(&object_signer, EquipmentEnhanceInfo {
             map: simple_map::new(),
@@ -382,7 +394,7 @@ module main::equipment{
     }
    
     // Need to remove friend for testnet because signature
-    public entry fun upgrade_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, amount: u64) acquires EquipmentCapability,  EquipmentData {
+    public(friend) entry fun upgrade_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, amount: u64) acquires EquipmentCapability,  EquipmentData {
         assert!(object::is_owner(equipment_object, signer::address_of(from)), ENOT_OWNER);
         assert!(amount>0, EINVALID_PROPERTY_VALUE);
         let collection = token::collection_object(equipment_object);
@@ -420,7 +432,7 @@ module main::equipment{
         property_map::update_typed(property_mutator_ref, &string::utf8(b"MV_SPD"), current_mv_spd + (amount * growth_mv_spd));
     }
 
-    public(friend) entry fun enhance_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, equipment_object_to_destroy: Object<EquipmentCapability>) acquires EquipmentCapability, EquipmentEnhanceInfo {
+    public(friend) entry fun enhance_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, equipment_object_to_destroy: Object<EquipmentCapability>) acquires EquipmentCapability, EquipmentEnhanceInfo, ResourceCapability {
         assert!(object::is_owner(equipment_object, signer::address_of(from)), ENOT_OWNER);
         assert!(object::is_owner(equipment_object_to_destroy, signer::address_of(from)), ENOT_OWNER);
         
@@ -437,9 +449,9 @@ module main::equipment{
         let current_grade = property_map::read_u64(&equipment_object, &string::utf8(b"GRADE"));
         let current_grade_2 = property_map::read_u64(&equipment_object_to_destroy, &string::utf8(b"GRADE"));
 
-        let current_equipment_id = property_map::read_u64(&equipment_object, &string::utf8(b"EQUIPMENT_ID"));
+        let equipment_id = property_map::read_u64(&equipment_object, &string::utf8(b"EQUIPMENT_ID"));
         let current_equipment_id_2 = property_map::read_u64(&equipment_object_to_destroy, &string::utf8(b"EQUIPMENT_ID"));
-        assert!(current_equipment_id == current_equipment_id_2, EINVALID_EQUIPMENT);
+        assert!(equipment_id == current_equipment_id_2, EINVALID_EQUIPMENT);
         assert!(current_grade == current_grade_2, EINVALID_EQUIPMENT);
 
         assert!( current_grade + 1 < 6, EMAX_LEVEL);
@@ -466,16 +478,23 @@ module main::equipment{
         let equipment = borrow_global_mut<EquipmentCapability>(equipment_token_address);
         let property_mutator_ref = &equipment.property_mutator_ref;
         let amount = 10;
-        property_map::update_typed(property_mutator_ref, &string::utf8(b"HP"), current_hp + (amount * growth_hp));
-        property_map::update_typed(property_mutator_ref, &string::utf8(b"ATK"), current_atk + (amount * growth_atk));
-        property_map::update_typed(property_mutator_ref, &string::utf8(b"DEF"), current_def + (amount * growth_def));
-        property_map::update_typed(property_mutator_ref, &string::utf8(b"ATK_SPD"), current_atk_spd + (amount * growth_atk_spd));
-        property_map::update_typed(property_mutator_ref, &string::utf8(b"MV_SPD"), current_mv_spd + (amount * growth_mv_spd));
-        property_map::update_typed(property_mutator_ref, &string::utf8(b"GRADE"), current_grade + 1);
+
+        let new_grade = current_grade + 1;
+        let new_hp = current_hp + (amount * growth_hp);
+        let new_atk = current_atk + (amount * growth_atk);
+        let new_def = current_def + (amount * growth_def);
+        let new_atk_spd = current_atk_spd + (amount * growth_atk_spd);
+        let new_mv_spd = current_mv_spd + (amount * growth_mv_spd);
+        property_map::update_typed(property_mutator_ref, &string::utf8(b"HP"), new_hp);
+        property_map::update_typed(property_mutator_ref, &string::utf8(b"ATK"), new_atk);
+        property_map::update_typed(property_mutator_ref, &string::utf8(b"DEF"), new_def);
+        property_map::update_typed(property_mutator_ref, &string::utf8(b"ATK_SPD"), new_atk_spd);
+        property_map::update_typed(property_mutator_ref, &string::utf8(b"MV_SPD"), new_mv_spd);
+        property_map::update_typed(property_mutator_ref, &string::utf8(b"GRADE"), new_grade);
 
         let equipment_upgrade_info = borrow_global_mut<EquipmentEnhanceInfo>(equipment_upgrade_info_address());
         let equipment_upgrade_map = equipment_upgrade_info.map;
-        let equipment_id = property_map::read_u64(&equipment_object, &string::utf8(b"EQUIPMENT_ID"));
+
         let next_grade = current_grade + 1;
         let equipment_bytes = bcs::to_bytes(&equipment_id);
         let next_grade_bytes = bcs::to_bytes(&next_grade);
@@ -487,12 +506,26 @@ module main::equipment{
 
         let mutator_ref = &equipment.mutator_ref;
         token::set_uri(mutator_ref, new_uri);
+
+        let event = EquipmentEnhanceEvent {
+            token_address: object::object_address(&equipment_object), 
+            equipment_id: equipment_id,
+            uri: new_uri,
+            grade: new_grade,
+            hp: new_hp,
+            atk: new_atk,
+            def: new_def,
+            atk_spd: new_atk_spd,
+            mv_spd: new_mv_spd
+        };
+        0x1::event::emit(event);
     }
     
     // TODO: Test this function
-    public entry fun destroy_equipment(from: &signer, equipment_object: Object<EquipmentCapability>) acquires EquipmentCapability {
+    public entry fun destroy_equipment(from: &signer, equipment_object: Object<EquipmentCapability>) acquires EquipmentCapability, ResourceCapability{
         assert!(object::is_owner(equipment_object, signer::address_of(from)), ENOT_OWNER);
-        burn_equipment(from, equipment_object);
+        object::transfer(from , equipment_object, capability_address());
+        burn_equipment(&get_token_signer(), equipment_object);
     }
 
     fun burn_equipment(from: &signer, equipment_object: Object<EquipmentCapability>) acquires EquipmentCapability{
@@ -504,6 +537,7 @@ module main::equipment{
             property_mutator_ref
         } = equipment_token;
         token::burn(burn_ref);
+        
     }
 
     public entry fun set_collection_uri(caller: &signer, new_uri: String) acquires EquipmentCollectionCapability{
@@ -625,7 +659,7 @@ module main::equipment{
         smart_table::clear(equipment_info_table);
     }
 
-    public entry fun set_equipment_upgrade_info(
+    public entry fun upsert_equipment_enhancement_info(
         account: &signer, 
         equipment_id: u64,
         grade: u64,
@@ -643,6 +677,38 @@ module main::equipment{
         string::append(&mut key_string, string::utf8(b"_"));
         string::append(&mut key_string, string::utf8(grade_bytes));
         simple_map::upsert(equipment_upgrade_info_map, key_string, new_url);
+    }
+
+    public entry fun add_all_equipment_enhancement_info(
+        account: &signer, 
+        equipment_id_vector: vector<u64>,
+        grade_vector: vector<u64>,
+        new_url_vector: vector<String>
+        ) acquires EquipmentEnhanceInfo {
+
+        admin::assert_is_admin(signer::address_of(account));
+
+        let equipment_upgrade_info_map = &mut borrow_global_mut<EquipmentEnhanceInfo>(equipment_upgrade_info_address()).map;
+       
+        let string_vector = vector::empty<string::String>();
+        let i = 0;
+        let length = vector::length(&equipment_id_vector);
+
+        while (i < length) {
+            let equipment_id = vector::borrow(&equipment_id_vector,i);
+            let grade = vector::borrow(&grade_vector,i);
+
+            let equipment_bytes = bcs::to_bytes(equipment_id);
+            let grade_bytes = bcs::to_bytes(grade);
+            
+            let key_string = string::utf8(equipment_bytes);
+            string::append(&mut key_string, string::utf8(b"_"));
+            string::append(&mut key_string, string::utf8(grade_bytes));
+            vector::push_back(&mut string_vector, key_string);
+            i = i + 1;
+        };
+
+        simple_map::add_all(equipment_upgrade_info_map, string_vector, new_url_vector);
     }
 
     public entry fun remove_equipment_upgrade_info(

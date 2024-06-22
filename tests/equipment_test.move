@@ -570,7 +570,7 @@ module main::equipment_test{
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
         let new_uri = string::utf8(b"NEW URL");
-        equipment::set_equipment_upgrade_info(creator, 0, 2,  new_uri);
+        equipment::upsert_equipment_enhancement_info(creator, 0, 2,  new_uri);
         equipment::enhance_equipment(user1, equip1, equip2);
         let shard_balance = eigen_shard::shard_balance(user1_addr);
         assert!(shard_balance == 99700, 0);
@@ -580,7 +580,7 @@ module main::equipment_test{
         
         
         let new_uri_3 = string::utf8(b"NEW URL 3");
-        equipment::set_equipment_upgrade_info(creator, 0, 3,  new_uri_3);
+        equipment::upsert_equipment_enhancement_info(creator, 0, 3,  new_uri_3);
         equipment::enhance_equipment(user1, equip3, equip4);
         equipment::enhance_equipment(user1, equip1, equip3);
         assert!(token::uri(equip1)==new_uri_3, EINVALID_PROPERTY_VALUE);
@@ -645,7 +645,7 @@ module main::equipment_test{
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
         let new_uri = string::utf8(b"NEW URL");
-        equipment::set_equipment_upgrade_info(creator, 0, 2,  new_uri);
+        equipment::upsert_equipment_enhancement_info(creator, 0, 2,  new_uri);
         equipment::enhance_equipment(user1, equip1, equip2);
         let shard_balance = eigen_shard::shard_balance(user1_addr);
         assert!(shard_balance == 99700, 0);
@@ -655,7 +655,7 @@ module main::equipment_test{
         
         
         let new_uri_3 = string::utf8(b"NEW URL 3");
-        equipment::set_equipment_upgrade_info(creator, 0, 3,  new_uri_3);
+        equipment::upsert_equipment_enhancement_info(creator, 0, 3,  new_uri_3);
         equipment::enhance_equipment(user1, equip3, equip4);
         equipment::enhance_equipment(user1, equip1, equip3);
         assert!(token::uri(equip1)==new_uri_3, EINVALID_PROPERTY_VALUE);
@@ -693,19 +693,19 @@ module main::equipment_test{
             10, 5, 5, 5, 5);
 
         let new_uri_4 = string::utf8(b"NEW URL 4");
-        equipment::set_equipment_upgrade_info(creator, 0, 4,  new_uri_4);
+        equipment::upsert_equipment_enhancement_info(creator, 0, 4,  new_uri_4);
         equipment::enhance_equipment(user1, equip1, equip5);
         let new_uri_5 = string::utf8(b"NEW URL 5");
-        equipment::set_equipment_upgrade_info(creator, 0, 5,  new_uri_5);
+        equipment::upsert_equipment_enhancement_info(creator, 0, 5,  new_uri_5);
         equipment::enhance_equipment(user1, equip1, equip6);
         assert!(token::uri(equip1)==new_uri_5, EINVALID_PROPERTY_VALUE);
         assert!(property_map::read_u64(&equip1, &string::utf8(b"GRADE"))==5, EINVALID_PROPERTY_VALUE);
 
         // let new_uri_6 = string::utf8(b"NEW URL 6");
-        // equipment::set_equipment_upgrade_info(creator, 0, 5,  new_uri_5);
+        // equipment::upsert_equipment_enhancement_info(creator, 0, 5,  new_uri_5);
         // equipment::enhance_equipment(user1, equip1, equip7);
-
     }
+
     #[test(creator = @main, user1 = @0x456, user2 = @0x789, aptos_framework = @aptos_framework)]
     #[expected_failure(abort_code = EINVALID_EQUIPMENT, location = main::equipment)]
     public fun test_enhance_equipment_different_id(creator: &signer, user1: &signer, user2: &signer, aptos_framework: &signer) {       
@@ -747,7 +747,80 @@ module main::equipment_test{
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
         let new_uri = string::utf8(b"NEW URL");
-        equipment::set_equipment_upgrade_info(creator, 0, 2,  new_uri);
+        equipment::upsert_equipment_enhancement_info(creator, 0, 2,  new_uri);
+        equipment::enhance_equipment(user1, equip1, equip2);
+        let shard_balance = eigen_shard::shard_balance(user1_addr);
+        assert!(shard_balance == 99700, 0);
+        assert!(property_map::read_u64(&equip1, &string::utf8(b"GRADE"))==2, EINVALID_PROPERTY_VALUE);
+        assert!(!object::is_object(object::object_address(&equip2)), ENOT_OWNER);
+        assert!(token::uri(equip1)==new_uri, EINVALID_PROPERTY_VALUE);
+    }
+
+    #[test(creator = @main, user1 = @0x456, user2 = @0x789, aptos_framework = @aptos_framework)]
+    public fun test_add_all_equipment_enhancement_info(creator: &signer, user1: &signer, user2: &signer, aptos_framework: &signer) {       
+        equipment::initialize_for_test(creator);
+        admin::initialize_for_test(creator);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000_000_000);
+        equipment::init_upgrade_equipment_capability(creator);
+        eigen_shard::initialize_for_test(creator);
+        let equipment_part_id = 1;
+        let affinity_id = 1;
+        let grade = 1;
+        let level = 1;
+
+        let equip1 = equipment::create_equipment_for_test(user1, 0,  
+            string::utf8(b"Equipment Name"), 
+            string::utf8(b"Equipment Description"),
+            string::utf8(b"Equipment Uri"),
+            equipment_part_id,
+            affinity_id,
+            grade, level,
+            100, 10, 11, 12, 50,
+            10, 5, 5, 5, 5);
+        
+        let equip2 = equipment::create_equipment_for_test(user1, 0,  
+            string::utf8(b"Equipment Name"), 
+            string::utf8(b"Equipment Description"),
+            string::utf8(b"Equipment Uri"),
+            equipment_part_id,
+            affinity_id,
+            grade, level,
+            100, 10, 11, 12, 50,
+            10, 5, 5, 5, 5);
+        
+        let equip3 = equipment::create_equipment_for_test(user1, 0,  
+            string::utf8(b"Equipment Name"), 
+            string::utf8(b"Equipment Description"),
+            string::utf8(b"Equipment Uri"),
+            equipment_part_id,
+            affinity_id,
+            grade, level,
+            100, 10, 11, 12, 50,
+            10, 5, 5, 5, 5);
+                    
+        let equip4 = equipment::create_equipment_for_test(user1, 0,  
+            string::utf8(b"Equipment Name"), 
+            string::utf8(b"Equipment Description"),
+            string::utf8(b"Equipment Uri"),
+            equipment_part_id,
+            affinity_id,
+            grade, level,
+            100, 10, 11, 12, 50,
+            10, 5, 5, 5, 5);
+
+        let user1_addr = signer::address_of(user1);
+        eigen_shard::mint_shard(user1, 100000);
+        assert!(token::uri(equip1)==string::utf8(b"Equipment Uri"), EINVALID_PROPERTY_VALUE);
+
+        let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
+        let new_uri = string::utf8(b"NEW URL");
+        equipment::add_all_equipment_enhancement_info(creator,vector[0,0,0,0,0], 
+        vector[1,2,3,4,5], 
+        vector[string::utf8(b"NEW URL 1"),
+        string::utf8(b"NEW URL"),
+        string::utf8(b"NEW URL 3"),
+        string::utf8(b"NEW URL 4"),
+        string::utf8(b"NEW URL 5")]);
         equipment::enhance_equipment(user1, equip1, equip2);
         let shard_balance = eigen_shard::shard_balance(user1_addr);
         assert!(shard_balance == 99700, 0);
@@ -755,7 +828,66 @@ module main::equipment_test{
         assert!(!object::is_object(object::object_address(&equip2)), ENOT_OWNER);
         assert!(token::uri(equip1)==new_uri, EINVALID_PROPERTY_VALUE);
         
-       
+        let new_uri_3 = string::utf8(b"NEW URL 3");
+        
+        equipment::enhance_equipment(user1, equip3, equip4);
+        equipment::enhance_equipment(user1, equip1, equip3);
+        assert!(token::uri(equip1)==new_uri_3, EINVALID_PROPERTY_VALUE);
+        assert!(property_map::read_u64(&equip1, &string::utf8(b"GRADE"))==3, EINVALID_PROPERTY_VALUE);
 
+
+        let equip5 = equipment::create_equipment_for_test(user1, 0,  
+            string::utf8(b"Equipment Name"), 
+            string::utf8(b"Equipment Description"),
+            string::utf8(b"Equipment Uri"),
+            equipment_part_id,
+            affinity_id,
+            3, level,
+            100, 10, 11, 12, 50,
+            10, 5, 5, 5, 5);
+
+        let equip6 = equipment::create_equipment_for_test(user1, 0,  
+            string::utf8(b"Equipment Name"), 
+            string::utf8(b"Equipment Description"),
+            string::utf8(b"Equipment Uri"),
+            equipment_part_id,
+            affinity_id,
+            4, level,
+            100, 10, 11, 12, 50,
+            10, 5, 5, 5, 5);
+
+        let equip7 = equipment::create_equipment_for_test(user1, 0,  
+            string::utf8(b"Equipment Name"), 
+            string::utf8(b"Equipment Description"),
+            string::utf8(b"Equipment Uri"),
+            equipment_part_id,
+            affinity_id,
+            3, level,
+            100, 10, 11, 12, 50,
+            10, 5, 5, 5, 5);
+
+            let equip8 = equipment::create_equipment_for_test(user1, 0,  
+            string::utf8(b"Equipment Name"), 
+            string::utf8(b"Equipment Description"),
+            string::utf8(b"Equipment Uri"),
+            equipment_part_id,
+            affinity_id,
+            3, level,
+            100, 10, 11, 12, 50,
+            10, 5, 5, 5, 5);
+
+        let new_uri_4 = string::utf8(b"NEW URL 4");
+        let new_uri_5 = string::utf8(b"NEW URL 5");
+
+        equipment::enhance_equipment(user1, equip1, equip5);
+        equipment::enhance_equipment(user1, equip1, equip6);
+        equipment::enhance_equipment(user1, equip7, equip8);
+
+        assert!(token::uri(equip1)==new_uri_5, EINVALID_PROPERTY_VALUE);
+        assert!(property_map::read_u64(&equip1, &string::utf8(b"GRADE"))==5, EINVALID_PROPERTY_VALUE);
+        assert!(token::uri(equip7)==new_uri_4, EINVALID_PROPERTY_VALUE);
+        assert!(property_map::read_u64(&equip7, &string::utf8(b"GRADE"))==4, EINVALID_PROPERTY_VALUE);
+
+       
     }
 }

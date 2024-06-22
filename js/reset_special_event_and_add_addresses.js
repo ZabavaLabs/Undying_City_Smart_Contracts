@@ -20,14 +20,14 @@ const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network
 
 
 // Path to the CSV file
-const filePath = './data/whitelist_addresses_5.csv';
-const eventName = "Third Free Mint of Undying City!";
+const filePath = './data/whitelist_addresses_6.csv';
+const eventName = "Fourth Free Mint of Undying City!";
 // const startTime = 1714614245_000_000;
 // Friday 3rd May 10:30 PM SGT
-const startTime = 1714744800_000_000;
+const startTime = 1717768800_000_000;
 
 // Wednesday 8th May 10:30 PM SGT
-const endTime = 1715176800_000_000;
+const endTime = 1718200800_000_000;
 
 const read_account_data = () => {
     let doc;

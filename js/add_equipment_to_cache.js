@@ -27,9 +27,9 @@ const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network
 
 
 // ANCHOR: PARAMETERS TO MODIFY
-const cache_id = 0;
-const start_equipment_id = 24;
-const end_equipment_id_inclusive = 29;
+const cache_id = 1;
+const start_equipment_id = 30;
+const end_equipment_id_inclusive = 35;
 const filePath = `./data/equipment_to_cache_${cache_id}.csv`;
 
 
