@@ -19,15 +19,11 @@ const yaml = require('js-yaml');
 const fs = require('fs');
 
 const APTOS_COIN = "0x1::aptos_coin::AptosCoin";
-const COIN_STORE = `0x1::coin::CoinStore<${APTOS_COIN}>`;
-const ALICE_INITIAL_BALANCE = 100_000_000;
-const BOB_INITIAL_BALANCE = 100;
-const TRANSFER_AMOUNT = 100;
 const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network.MAINNET;
 
 
 // Path to the CSV file
-const filePath = './data/new_equipment_data.tsv';
+const filePath = './data/new_equipment_data_5.tsv';
 
 async function readTSV(filePath) {
     let data;

@@ -20,7 +20,7 @@ const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network
 
 
 // Path to the CSV file
-const filePath = './data/whitelist_addresses_5.csv';
+const filePath = './data/whitelist_addresses_8.csv';
 
 const read_account_data = () => {
     let doc;

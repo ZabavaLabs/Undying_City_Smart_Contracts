@@ -27,11 +27,9 @@ const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network
 
 
 // ANCHOR: PARAMETERS TO MODIFY
-const cache_id = 1;
-const start_equipment_id = 30;
-const end_equipment_id_inclusive = 35;
-const filePath = `./data/equipment_to_cache_${cache_id}.csv`;
-
+const cache_id = 0;
+const start_equipment_id = 36;
+const end_equipment_id_inclusive = 47;
 
 const read_account_data = () => {
     let doc;
@@ -67,7 +65,7 @@ const add_equipment_to_cache = async () => {
                 functionArguments: [cache_id, i],
             },
         });
-        console.log(`Sending add_equipment transaction`);
+        console.log(`Sending add_equipment_to_cache transaction`);
 
         const committedTransaction = await aptos.signAndSubmitTransaction({ signer: main, transaction });
         console.log(`Transaction hash: ${committedTransaction.hash}`);

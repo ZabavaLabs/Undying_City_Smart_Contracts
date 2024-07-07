@@ -20,7 +20,7 @@ const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network
 
 
 // Path to the CSV file
-const filePath = './data/whitelist_addresses_5.csv';
+const filePath = './data/whitelist_addresses_7.csv';
 
 const read_account_data = () => {
     let doc;
@@ -84,7 +84,7 @@ const add_addresses = async () => {
             function: `${account_data.profiles.default.account}::omni_cache::add_whitelist_addresses`,
             typeArguments: [],
             functionArguments: [getJthColumnAsArray(rowData, 0), getJthColumnAsArray(rowData, 1)],
-        },
+        }
     });
     console.log(`Sending add_addresses transaction`);
 

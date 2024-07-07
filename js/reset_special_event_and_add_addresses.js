@@ -20,14 +20,14 @@ const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network
 
 
 // Path to the CSV file
-const filePath = './data/whitelist_addresses_6.csv';
-const eventName = "Fourth Free Mint of Undying City!";
+const filePath = './data/whitelist_addresses_7.csv';
+const eventName = "Fifth Free Mint of Undying City!";
 // const startTime = 1714614245_000_000;
-// Friday 3rd May 10:30 PM SGT
-const startTime = 1717768800_000_000;
+// Friday 5th July 10:00 PM SGT
+const startTime = 1720188000_000_000;
 
 // Wednesday 8th May 10:30 PM SGT
-const endTime = 1718200800_000_000;
+const endTime = 1720620000_000_000;
 
 const read_account_data = () => {
     let doc;
@@ -92,6 +92,9 @@ const add_special_event_and_addresses = async () => {
             typeArguments: [],
             functionArguments: [eventName, startTime, endTime, getJthColumnAsArray(rowData, 0), getJthColumnAsArray(rowData, 1)],
         },
+        // options: {
+        //     maxGasAmount: 5_000_000
+        // }
     });
     console.log(`Sending add_special_event_and_addresses transaction`);
 

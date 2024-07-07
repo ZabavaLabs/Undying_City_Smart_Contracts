@@ -25,7 +25,7 @@ const APTOS_NETWORK = NetworkToNetworkName[process.env.APTOS_NETWORK] || Network
 
 
 // ANCHOR: PARAMETERS TO MODIFY
-const filePath = `./data/enhance_equipment.csv`;
+const filePath = `./data/enhance_equipment_2.csv`;
 
 
 const read_account_data = () => {
