@@ -103,6 +103,13 @@ module main::daily_spins {
         smart_table::add(spin_result_table,key,reward);
     }
 
+    public(friend) entry fun clear_table(caller:&signer) acquires SpinCapability{
+        let caller_address = signer::address_of(caller);
+        admin::assert_is_admin(caller_address);
+        let spin_capability = borrow_global_mut<SpinCapability>(@main);
+        smart_table::clear(&mut spin_capability.spin_result_table);
+    }
+
     // View function
     #[view]
     public fun able_to_spin(user_addr: address): bool acquires SpinCapability {
