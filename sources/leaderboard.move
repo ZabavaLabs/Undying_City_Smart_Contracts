@@ -63,7 +63,11 @@ module main::leaderboard {
     public(friend) fun add_score(user_addr: address, score: u64) acquires LeaderboardStruct {
         assert_before_end_time();
         let leaderboardStruct = borrow_global_mut<LeaderboardStruct>(@main);
-        let current_score = *simple_map::borrow(&leaderboardStruct.score_map, &user_addr);
+        let current_score = 0;
+        if (simple_map::contains_key(&leaderboardStruct.score_map, &user_addr)){
+            current_score = *simple_map::borrow(&leaderboardStruct.score_map, &user_addr);
+        };
+
         let new_score = current_score + score;
         simple_map::upsert(&mut leaderboardStruct.score_map, user_addr, new_score);
 
@@ -126,8 +130,13 @@ module main::leaderboard {
 
     // Testing functions
     #[test_only]
-    public fun initialize_for_testing(creator: &signer) {
+    public fun initialize_for_test(creator: &signer) {
         init_module(creator);
+    }
+
+    #[test_only]
+    public fun reset_leaderboard_for_test(creator: &signer, end_time:u64) acquires LeaderboardStruct {
+        reset_leaderboard(creator, end_time);
     }
 
 }

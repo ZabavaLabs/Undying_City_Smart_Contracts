@@ -29,8 +29,8 @@ module main::daily_spins {
     // #[test_only]
     // friend main::random_mint_test;
 
-    // #[test_only]
-    // friend main::spin_wheel_test;
+    #[test_only]
+    friend main::leaderboard_test;
 
     // Error Codes
 
@@ -42,18 +42,18 @@ module main::daily_spins {
 
 
     struct SpinCapability has key, store {
-        address_map: SimpleMap<address, NftSpinInfo>,
+        address_map: SimpleMap<address, SpinInfo>,
         spin_result_table: SmartTable<u64, u64>,
     }
 
-    struct NftSpinInfo has store, copy, drop {
+    struct SpinInfo has store, copy, drop {
         spin_result: u64,
         day_index: u8,
         timestamp: u64
     }
 
     fun init_module(deployer: &signer) {
-        let address_map = aptos_std::simple_map::new<address, NftSpinInfo>();
+        let address_map = aptos_std::simple_map::new<address, SpinInfo>();
         let spin_result_table = aptos_std::smart_table::new<u64, u64>();
         let address_map = SpinCapability { address_map: address_map, spin_result_table};
         move_to(deployer, address_map);
@@ -71,10 +71,19 @@ module main::daily_spins {
         
         let spin_capability = borrow_global_mut<SpinCapability>(@main);
         let address_map = spin_capability.address_map;
-        let nft_spin_info = simple_map::borrow(&address_map,&user_addr);
+        let user_spin_info;
+        if (!simple_map::contains_key(&address_map, &user_addr)){
+            user_spin_info = SpinInfo {
+                spin_result: 0,
+                day_index: 0,
+                timestamp: 0 
+            }
+        } else{
+            user_spin_info = *simple_map::borrow(&address_map,&user_addr);
+        };
         let rewards = *smart_table::borrow(&spin_capability.spin_result_table, random_number);
 
-        let day_index = nft_spin_info.day_index;
+        let day_index = user_spin_info.day_index;
 
         if (day_index == 2){
             main::leaderboard::add_score(user_addr, rewards * 2);
@@ -87,12 +96,12 @@ module main::daily_spins {
             day_index = day_index + 1;
         };
 
-        let new_nft_spin_info = NftSpinInfo {
+        let new_spin_info = SpinInfo {
             spin_result: random_number,
             day_index: day_index,
             timestamp: timestamp::now_microseconds()
         };
-        aptos_std::simple_map::upsert(&mut address_map, user_addr, new_nft_spin_info);
+        aptos_std::simple_map::upsert(&mut address_map, user_addr, new_spin_info);
     }
 
     public(friend) entry fun add_result_entry(caller:&signer, key: u64, reward:u64) acquires SpinCapability{
@@ -122,7 +131,7 @@ module main::daily_spins {
         if (!contains_key) {
             output = true;
         } else {
-            let nft_spin_info: NftSpinInfo = *aptos_std::simple_map::borrow(&address_map, &user_addr);
+            let nft_spin_info: SpinInfo = *aptos_std::simple_map::borrow(&address_map, &user_addr);
             if (timestamp::now_microseconds() > nft_spin_info.timestamp + TIME_BETWEEN_SPINS) {
                 output = true;
             }
@@ -148,7 +157,7 @@ module main::daily_spins {
     //     if (!contains_key) {
     //         output = false;
     //     } else {
-    //         let nft_spin_info: NftSpinInfo = *aptos_std::simple_map::borrow(&simple_map, &nft_addr);
+    //         let nft_spin_info: SpinInfo = *aptos_std::simple_map::borrow(&simple_map, &nft_addr);
     //         if (nft_spin_info.spin_result != 0) {
     //             output = true;
     //         };
@@ -170,7 +179,7 @@ module main::daily_spins {
     //     if (!contains_key) {
     //         output = 0;
     //     } else {
-    //         let nft_spin_info: NftSpinInfo = *aptos_std::simple_map::borrow(&simple_map, &nft_addr);
+    //         let nft_spin_info: SpinInfo = *aptos_std::simple_map::borrow(&simple_map, &nft_addr);
     //         output = nft_spin_info.spin_result;
     //     };
     //     output
@@ -193,8 +202,13 @@ module main::daily_spins {
 
     // Testing functions
     #[test_only]
-    public fun initialize_for_testing(creator: &signer) {
+    public fun initialize_for_test(creator: &signer) {
         init_module(creator);
+    }
+
+    #[test_only]
+    public fun spin_wheel_for_test(caller: &signer) acquires SpinCapability {
+        spin_wheel(caller);
     }
 
 }
