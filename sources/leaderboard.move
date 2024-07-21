@@ -28,7 +28,7 @@ module main::leaderboard {
     const EINVALID_COLLECTION: u64 = 1;
     const ECLAIM_FIRST: u64 = 2;
 
-   use std::vector;
+    use std::vector;
 
     // Error Codes
     const ENOT_DEPLOYER: u64 = 1;
@@ -50,6 +50,8 @@ module main::leaderboard {
         score: u64
     }
 
+    friend main::daily_spins;
+
     fun init_module(deployer: &signer) {
         let score_map = aptos_std::simple_map::new<address, u64>();
         let leaderboard_vector = vector::empty<LeaderboardElement>();
@@ -58,7 +60,7 @@ module main::leaderboard {
         move_to(deployer, leaderboardStruct);
     }
 
-    fun add_score(user_addr: address, score: u64) acquires LeaderboardStruct {
+    public(friend) fun add_score(user_addr: address, score: u64) acquires LeaderboardStruct {
         assert_before_end_time();
         let leaderboardStruct = borrow_global_mut<LeaderboardStruct>(@main);
         let current_score = *simple_map::borrow(&leaderboardStruct.score_map, &user_addr);

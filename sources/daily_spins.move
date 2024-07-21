@@ -21,6 +21,7 @@ module main::daily_spins {
 
     use std::option;
     use std::signer;
+    use main::admin;
 
     const EINVALID_COLLECTION: u64 = 1;
     const ECLAIM_FIRST: u64 = 2;
@@ -32,23 +33,13 @@ module main::daily_spins {
     // friend main::spin_wheel_test;
 
     // Error Codes
-    const ENOT_DEPLOYER: u64 = 1;
-    const ENOT_OWNER: u64 = 2;
-    const ENFT_ID_NOT_FOUND: u64 = 3;
-    const EUNABLE_TO_MINT: u64 = 4;
-    const EWEIGHT_ZERO: u64 = 5;
+
+
     const EUNABLE_TO_CLAIM: u64 = 6;
 
-    // const MINT_FEE:u64 = 1_000_000;
     // 1 Day
     const TIME_BETWEEN_SPINS: u64 = 24 * 60 * 60 * 1_000_000;
 
-    const SPIN_SLOTS: u64 = 6;
-    const PRIZE_1: u64 = 1_000_000;
-    const PRIZE_2: u64 = 2_000_000;
-    const PRIZE_3_NFT_ID: u64 = 1;
-    const PRIZE_4_NFT_ID_1: u64 = 2;
-    const PRIZE_4_NFT_ID_2: u64 = 3;
 
     struct SpinCapability has key, store {
         address_map: SimpleMap<address, NftSpinInfo>,
@@ -68,7 +59,6 @@ module main::daily_spins {
         move_to(deployer, address_map);
     }
 
-    // Commits the result of the randomness to a map.
     #[randomness]
     entry fun spin_wheel(user: &signer) acquires SpinCapability {
         let user_addr = signer::address_of(user);
@@ -78,21 +68,39 @@ module main::daily_spins {
         let user_addr = signer::address_of(user);
         debug::print(&utf8(b"spin random number was:"));
         debug::print(&random_number);
+        
+        let spin_capability = borrow_global_mut<SpinCapability>(@main);
+        let address_map = spin_capability.address_map;
+        let nft_spin_info = simple_map::borrow(&address_map,&user_addr);
+        let rewards = *smart_table::borrow(&spin_capability.spin_result_table, random_number);
 
-        let address_map = &mut borrow_global_mut<SpinCapability>(@main).address_map;
-        let nft_spin_info = simple_map::borrow(address_map,&user_addr);
         let day_index = nft_spin_info.day_index;
-        if (day_index == 7){
+
+        if (day_index == 2){
+            main::leaderboard::add_score(user_addr, rewards * 2);
+            day_index = day_index + 1;
+        } else if (day_index == 6){
+            main::leaderboard::add_score(user_addr, rewards * 3);
             day_index = 0;
         } else{
+            main::leaderboard::add_score(user_addr, rewards);
             day_index = day_index + 1;
         };
+
         let new_nft_spin_info = NftSpinInfo {
             spin_result: random_number,
             day_index: day_index,
             timestamp: timestamp::now_microseconds()
         };
-        aptos_std::simple_map::upsert(address_map, user_addr, new_nft_spin_info);
+        aptos_std::simple_map::upsert(&mut address_map, user_addr, new_nft_spin_info);
+    }
+
+    public(friend) entry fun add_result_entry(caller:&signer, key: u64, reward:u64) acquires SpinCapability{
+        let caller_address = signer::address_of(caller);
+        admin::assert_is_admin(caller_address);
+        let spin_capability = borrow_global_mut<SpinCapability>(@main);
+        let spin_result_table = &mut spin_capability.spin_result_table;
+        smart_table::add(spin_result_table,key,reward);
     }
 
     // View function
@@ -161,12 +169,19 @@ module main::daily_spins {
     //     output
     // }
 
-     #[view]
+    #[view]
     public fun spin_result_table_length(): u64 acquires SpinCapability {
         let spin_capability = borrow_global<SpinCapability>(@main);
         // let spin_result_table = spin_capability.spin_result_table;
         let length = aptos_std::smart_table::length(&spin_capability.spin_result_table);
         length
+    }
+
+    #[view]
+    public fun spin_reward(key:u64): u64 acquires SpinCapability {
+        let spin_capability = borrow_global<SpinCapability>(@main);
+        let reward = *smart_table::borrow(&spin_capability.spin_result_table,key);
+        reward
     }
 
     // Testing functions
