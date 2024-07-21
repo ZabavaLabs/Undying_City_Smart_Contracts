@@ -37,11 +37,12 @@ module main::leaderboard {
     const EUNABLE_TO_MINT: u64 = 4;
     const EWEIGHT_ZERO: u64 = 5;
     const EUNABLE_TO_CLAIM: u64 = 6;
-
+    const ELEADERBOARD_SEASON_ENDED:u64 = 7;
 
     struct LeaderboardStruct has key, store {
         leaderboard_vector: vector<LeaderboardElement>,
         score_map: SimpleMap<address, u64>,
+        end_time: u64,
     }
 
     struct LeaderboardElement has store, copy, drop {
@@ -52,24 +53,25 @@ module main::leaderboard {
     fun init_module(deployer: &signer) {
         let score_map = aptos_std::simple_map::new<address, u64>();
         let leaderboard_vector = vector::empty<LeaderboardElement>();
-
-        let leaderboardStruct = LeaderboardStruct { leaderboard_vector, score_map};
+        let end_time = 0;
+        let leaderboardStruct = LeaderboardStruct { leaderboard_vector, score_map, end_time};
         move_to(deployer, leaderboardStruct);
     }
 
     fun add_score(user_addr: address, score: u64) acquires LeaderboardStruct {
-        let leaderboardStruct = borrow_global<LeaderboardStruct>(@main);
-        let current_score = *simple_map::get(&leaderboardStruct.score_map, &user_addr);
+        assert_before_end_time();
+        let leaderboardStruct = borrow_global_mut<LeaderboardStruct>(@main);
+        let current_score = *simple_map::borrow(&leaderboardStruct.score_map, &user_addr);
         let new_score = current_score + score;
-        simple_map::insert(&mut leaderboardStruct.score_map, &user_addr, new_score);
+        simple_map::upsert(&mut leaderboardStruct.score_map, user_addr, new_score);
 
         let leaderboard_vector = &mut leaderboardStruct.leaderboard_vector;
-        let length = vector::length(leaderboard_vector);
+        let leaderboard_length = vector::length(leaderboard_vector);
         let i = 0;
 
-        while (i < length && vector::length(&result) < 20) {
-            let LeaderboardElement = *vector::borrow(leaderboard_vector, i);
-            let entry_score = LeaderboardElement.score;
+        while (i < leaderboard_length) {
+            let leaderboardElement = *vector::borrow(leaderboard_vector, i);
+            let entry_score = leaderboardElement.score;
             if (new_score > entry_score){
                 break;
             } ;
@@ -77,7 +79,7 @@ module main::leaderboard {
         };
         if (i < 20) {
             let new_entry = LeaderboardElement { addr: user_addr, score: new_score };
-            vector::insert<LeaderboardElement>(new_entry, i, leaderboard_vector);
+            vector::insert(leaderboard_vector, i, new_entry);
         };
         //Keep only top 20
         while(vector::length(leaderboard_vector) > 20) {
@@ -85,34 +87,18 @@ module main::leaderboard {
         };
     }
 
-    entry fun reset_leaderboard(account: &signer) acquires LeaderboardStruct {
+    entry fun reset_leaderboard(account: &signer, end_time: u64) acquires LeaderboardStruct {
         admin::assert_is_admin(signer::address_of(account));
         
-        let leaderboardStruct = borrow_global<LeaderboardStruct>(@main);
-        let current_score = *simple_map::get(&leaderboardStruct.score_map, &user_addr);
-        let new_score = current_score + score;
-        simple_map::insert(&mut leaderboardStruct.score_map, &user_addr, new_score);
+        let leaderboardStruct = borrow_global_mut<LeaderboardStruct>(@main);
+        leaderboardStruct.score_map = aptos_std::simple_map::new<address, u64>();
+        leaderboardStruct.leaderboard_vector = vector::empty<LeaderboardElement>();
+        leaderboardStruct.end_time = end_time;
+    }
 
-        let leaderboard_vector = &mut leaderboardStruct.leaderboard_vector;
-        let length = vector::length(leaderboard_vector);
-        let i = 0;
-
-        while (i < length && vector::length(&result) < 20) {
-            let LeaderboardElement = *vector::borrow(leaderboard_vector, i);
-            let entry_score = LeaderboardElement.score;
-            if (new_score > entry_score){
-                break;
-            } ;
-            i = i + 1;
-        };
-        if (i < 20) {
-            let new_entry = LeaderboardElement { addr: user_addr, score: new_score };
-            vector::insert<LeaderboardElement>(new_entry, i, leaderboard_vector);
-        };
-        //Keep only top 20
-        while(vector::length(leaderboard_vector) > 20) {
-            vector::pop_back(leaderboard_vector);
-        };
+    public fun assert_before_end_time() acquires LeaderboardStruct{
+        let end_time = borrow_global<LeaderboardStruct>(@main).end_time;
+        assert!(timestamp::now_microseconds() < end_time,ELEADERBOARD_SEASON_ENDED);
     }
 
     #[view]

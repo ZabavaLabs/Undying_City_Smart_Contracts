@@ -57,6 +57,7 @@ module main::daily_spins {
 
     struct NftSpinInfo has store, copy, drop {
         spin_result: u64,
+        day_index: u8,
         timestamp: u64
     }
 
@@ -79,55 +80,20 @@ module main::daily_spins {
         debug::print(&random_number);
 
         let address_map = &mut borrow_global_mut<SpinCapability>(@main).address_map;
-        let nft_spin_info = NftSpinInfo {
+        let nft_spin_info = simple_map::borrow(address_map,&user_addr);
+        let day_index = nft_spin_info.day_index;
+        if (day_index == 7){
+            day_index = 0;
+        } else{
+            day_index = day_index + 1;
+        };
+        let new_nft_spin_info = NftSpinInfo {
             spin_result: random_number,
+            day_index: day_index,
             timestamp: timestamp::now_microseconds()
         };
-        aptos_std::simple_map::upsert(address_map, user_addr, nft_spin_info);
+        aptos_std::simple_map::upsert(address_map, user_addr, new_nft_spin_info);
     }
-
-    // Claim Prize.
-    // public(friend) entry fun claim_spin_prize(user: &signer, nft: Object<Token>) acquires SpinCapability {
-    //     assert!(object::is_owner(nft, signer::address_of(user)), ENOT_OWNER);
-    //     let prize_number = prize_number(nft);
-    //     assert!(prize_number != 0, EUNABLE_TO_CLAIM);
-
-    //     let nft_addr = object::object_address(&nft);
-
-    //     // Perform the various actions depending prize number
-    //     if (prize_number == 1) {
-    //         coin::transfer<AptosCoin>(user, @main, PRIZE_1);
-    //     }
-    //     else if (prize_number == 2) {
-    //         coin::transfer<AptosCoin>(user, @main, PRIZE_2);
-    //     }
-    //     else if (prize_number == 3) {
-    //         let nft_info_name = random_mint::get_nft_name(PRIZE_3_NFT_ID);
-    //         let nft_info_description = random_mint::get_nft_description(PRIZE_3_NFT_ID);
-    //         let nft_info_uri = random_mint::get_nft_uri(PRIZE_3_NFT_ID);
-
-    //         random_mint::create_nft(user, nft_info_name, nft_info_description, nft_info_uri,);
-    //     }
-    //     else if (prize_number == 4) {
-    //         let nft_info_name = random_mint::get_nft_name(PRIZE_4_NFT_ID_1);
-    //         let nft_info_description = random_mint::get_nft_description(PRIZE_4_NFT_ID_1);
-    //         let nft_info_uri = random_mint::get_nft_uri(PRIZE_4_NFT_ID_1);
-
-    //         random_mint::create_nft(user, nft_info_name, nft_info_description, nft_info_uri,);
-
-    //         let nft_info_name_2 = random_mint::get_nft_name(PRIZE_4_NFT_ID_2);
-    //         let nft_info_description_2 = random_mint::get_nft_description(PRIZE_4_NFT_ID_2);
-    //         let nft_info_uri_2 = random_mint::get_nft_uri(PRIZE_4_NFT_ID_2);
-
-    //         random_mint::create_nft(user, nft_info_name_2, nft_info_description_2,
-    //             nft_info_uri_2,);
-
-    //     };
-
-    //     let simple_map = &mut borrow_global_mut<SpinCapability>(@main).simple_map;
-    //     let nft_spin_info = aptos_std::simple_map::borrow_mut(simple_map, &nft_addr);
-    //     nft_spin_info.spin_result = 0;
-    // }
 
     // View function
     #[view]
