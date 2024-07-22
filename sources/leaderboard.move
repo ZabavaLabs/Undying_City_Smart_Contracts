@@ -147,7 +147,12 @@ module main::leaderboard {
     #[view]
     public fun user_score(user_addr:address): u64 acquires LeaderboardStruct {
         let leaderboardStruct = borrow_global<LeaderboardStruct>(@main);
-        *simple_map::borrow(&leaderboardStruct.score_map, &user_addr)
+        let contains_key = aptos_std::simple_map::contains_key(&leaderboardStruct.score_map, &user_addr);
+        if (!contains_key){
+            0   
+        }else{
+            *simple_map::borrow(&leaderboardStruct.score_map, &user_addr)
+        }
 
     }
 
