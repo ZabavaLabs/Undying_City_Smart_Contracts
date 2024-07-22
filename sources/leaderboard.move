@@ -75,9 +75,10 @@ module main::leaderboard {
         let leaderboard_length = vector::length(leaderboard_vector);
         let i = 0;
         let j = 0;
-        let new_record = false;
+        let new_highscore = false;
         let insert_index = 0;
         let remove_index = 100;
+        let previous_entry_exists = false;
 
         // Scan through entire leaderboard.
         // If score is higher than current score, store index.
@@ -85,30 +86,43 @@ module main::leaderboard {
         while (i < leaderboard_length) {
             let leaderboardElement = *vector::borrow(leaderboard_vector, i);
             let entry_score = leaderboardElement.score;
-            if (new_score > entry_score && !new_record ){
-                new_record = true;
+            if (new_score > entry_score && !new_highscore ){
+                new_highscore = true;
                 insert_index = i;
             } ;
             let entry_addr = leaderboardElement.addr;
             if (entry_addr == user_addr){
+                previous_entry_exists = true;
                 remove_index = i;
             };
             i = i + 1;
         };
 
-        if (!new_record){
+        if (!new_highscore){
             insert_index = i;
         };
+
         // Case when the user has a previous record and has broken the record.
+        // Case when the user has a previous record and has not broken the record.
+        // Case when the user doesn't have a previous record and has broken the record.
+        // Case when the user doesn't have a previous record and has not broken the record.
+
         // Need to remove the previous record and insert the new record.
-        if (remove_index < 20 && new_record) {
+        if (previous_entry_exists && new_highscore) {
             vector::remove(leaderboard_vector, remove_index);
-        };
-        if (insert_index < 20 ) {
             let new_entry = LeaderboardElement { addr: user_addr, score: new_score };
             vector::insert(leaderboard_vector, insert_index, new_entry);
-            // TODO: Need to remove older entries with the same addr.
-
+        } 
+        else if (previous_entry_exists && !new_highscore ) {
+            // TODO: Do nothing as we don't want to add additional entry
+        }
+        else if (!previous_entry_exists && new_highscore ) {
+            let new_entry = LeaderboardElement { addr: user_addr, score: new_score };
+            vector::insert(leaderboard_vector, insert_index, new_entry);
+        } 
+        else if (!previous_entry_exists && !new_highscore ) {
+            let new_entry = LeaderboardElement { addr: user_addr, score: new_score };
+            vector::insert(leaderboard_vector, leaderboard_length, new_entry);
         };
 
 
