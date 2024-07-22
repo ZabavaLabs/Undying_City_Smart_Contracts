@@ -110,14 +110,6 @@ module main::leaderboard {
     #[view]
     public fun leaderboard_top_20(): vector<LeaderboardElement> acquires LeaderboardStruct {
         let leaderboard_vector = &borrow_global<LeaderboardStruct>(@main).leaderboard_vector;
-        // let length = vector:length(leaderboard_vector);
-        // let result = vector::empty<LeaderboardElement>();
-        // let i = 0;
-        // while (i < length && vector::length(&result) < 20) {
-        //     let LeaderboardElement = *vector::borrow(leaderboard_vector, i);
-        //     vector::push_back(&mut result, LeaderboardElement)
-        // };        
-        // result
         *leaderboard_vector
     }
 
