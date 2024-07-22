@@ -74,15 +74,11 @@ module main::leaderboard {
         let leaderboard_vector = &mut leaderboardStruct.leaderboard_vector;
         let leaderboard_length = vector::length(leaderboard_vector);
         let i = 0;
-        let j = 0;
         let new_highscore = false;
         let insert_index = 0;
         let remove_index = 100;
         let previous_entry_exists = false;
 
-        // Scan through entire leaderboard.
-        // If score is higher than current score, store index.
-        // If 
         while (i < leaderboard_length) {
             let leaderboardElement = *vector::borrow(leaderboard_vector, i);
             let entry_score = leaderboardElement.score;
@@ -96,10 +92,6 @@ module main::leaderboard {
                 remove_index = i;
             };
             i = i + 1;
-        };
-
-        if (!new_highscore){
-            insert_index = i;
         };
 
         // Case when the user has a previous record and has broken the record.
@@ -125,34 +117,9 @@ module main::leaderboard {
             vector::insert(leaderboard_vector, leaderboard_length, new_entry);
         };
 
-
-
-        // while (i < leaderboard_length) {
-        //     let leaderboardElement = *vector::borrow(leaderboard_vector, i);
-        //     let entry_addr = leaderboardElement.addr;
-        //     if (entry_addr == user_addr){
-        //         vector::remove(leaderboard_vector, i);
-        //         break;
-        //     };
-        //     i = i + 1;
-        // };
-
-        // while (j < leaderboard_length) {
-
-        //     let leaderboardElement = *vector::borrow(leaderboard_vector, j);
-        //     let entry_score = leaderboardElement.score;
-        //     if (new_score > entry_score ){
-        //         break;
-        //     } ;
-        //     j = j + 1;
-
-        // };
-        // let new_entry = LeaderboardElement { addr: user_addr, score: new_score };
-        // vector::insert(leaderboard_vector, j , new_entry);
-
-
         //Keep only top 20
-        while(vector::length(leaderboard_vector) > 20) {
+        let max_leaderboard_length = 20;
+        while(vector::length(leaderboard_vector) > max_leaderboard_length) {
             vector::pop_back(leaderboard_vector);
         };
     }
