@@ -74,19 +74,69 @@ module main::leaderboard {
         let leaderboard_vector = &mut leaderboardStruct.leaderboard_vector;
         let leaderboard_length = vector::length(leaderboard_vector);
         let i = 0;
+        let j = 0;
+        let new_record = false;
+        let insert_index = 0;
+        let remove_index = 100;
 
+        // Scan through entire leaderboard.
+        // If score is higher than current score, store index.
+        // If 
         while (i < leaderboard_length) {
             let leaderboardElement = *vector::borrow(leaderboard_vector, i);
             let entry_score = leaderboardElement.score;
-            if (new_score > entry_score){
-                break;
+            if (new_score > entry_score && !new_record ){
+                new_record = true;
+                insert_index = i;
             } ;
+            let entry_addr = leaderboardElement.addr;
+            if (entry_addr == user_addr){
+                remove_index = i;
+            };
             i = i + 1;
         };
-        if (i < 20) {
-            let new_entry = LeaderboardElement { addr: user_addr, score: new_score };
-            vector::insert(leaderboard_vector, i, new_entry);
+
+        if (!new_record){
+            insert_index = i;
         };
+        // Case when the user has a previous record and has broken the record.
+        // Need to remove the previous record and insert the new record.
+        if (remove_index < 20 && new_record) {
+            vector::remove(leaderboard_vector, remove_index);
+        };
+        if (insert_index < 20 ) {
+            let new_entry = LeaderboardElement { addr: user_addr, score: new_score };
+            vector::insert(leaderboard_vector, insert_index, new_entry);
+            // TODO: Need to remove older entries with the same addr.
+
+        };
+
+
+
+        // while (i < leaderboard_length) {
+        //     let leaderboardElement = *vector::borrow(leaderboard_vector, i);
+        //     let entry_addr = leaderboardElement.addr;
+        //     if (entry_addr == user_addr){
+        //         vector::remove(leaderboard_vector, i);
+        //         break;
+        //     };
+        //     i = i + 1;
+        // };
+
+        // while (j < leaderboard_length) {
+
+        //     let leaderboardElement = *vector::borrow(leaderboard_vector, j);
+        //     let entry_score = leaderboardElement.score;
+        //     if (new_score > entry_score ){
+        //         break;
+        //     } ;
+        //     j = j + 1;
+
+        // };
+        // let new_entry = LeaderboardElement { addr: user_addr, score: new_score };
+        // vector::insert(leaderboard_vector, j , new_entry);
+
+
         //Keep only top 20
         while(vector::length(leaderboard_vector) > 20) {
             vector::pop_back(leaderboard_vector);
@@ -108,7 +158,7 @@ module main::leaderboard {
     }
 
     #[view]
-    public fun leaderboard_top_20(): vector<LeaderboardElement> acquires LeaderboardStruct {
+    public fun get_leaderboard_vector(): vector<LeaderboardElement> acquires LeaderboardStruct {
         let leaderboard_vector = &borrow_global<LeaderboardStruct>(@main).leaderboard_vector;
         *leaderboard_vector
     }

@@ -101,9 +101,9 @@ module main::daily_spins {
             day_index: day_index,
             timestamp: timestamp::now_microseconds()
         };
-        debug::print(&new_spin_info.spin_result);
-        debug::print(&new_spin_info.day_index);
-        debug::print(&new_spin_info.timestamp);
+        // debug::print(&new_spin_info.spin_result);
+        // debug::print(&new_spin_info.day_index);
+        // debug::print(&new_spin_info.timestamp);
 
         aptos_std::simple_map::upsert(&mut spin_capability.address_map, user_addr, new_spin_info);
 
@@ -185,21 +185,23 @@ module main::daily_spins {
         }
     }
 
-    // #[view]
-    // public fun last_spin_info(user_addr:address): u64 acquires SpinData {
-    //     let spin_capability = borrow_global<SpinData>(@main);
-    //     if (!simple_map::contains_key(&spin_capability.address_map, &user_addr)){
-    //         let output = LastSpinInfo{
-    //             spin_result: 0,
-    //             day_index: 0,
-    //             timestamp: 0
-    //         };
-    //         output
-    //     }else{
-    //         let spin_info = *simple_map::borrow(&spin_capability.address_map,&user_addr);
-    //         spin_info
-    //     }
-    // }
+  
+    #[view]
+    public fun last_spin_info(user_addr:address): (u64,u8,u64) acquires SpinData {
+        let spin_capability = borrow_global<SpinData>(@main);
+        if (!simple_map::contains_key(&spin_capability.address_map, &user_addr)){
+            let output = LastSpinInfo{
+                spin_result: 0,
+                day_index: 0,
+                timestamp: 0
+            };
+            (output.spin_result, output.day_index, output.timestamp)
+        }else{
+            let spin_info = *simple_map::borrow(&spin_capability.address_map,&user_addr);
+            (spin_info.spin_result, spin_info.day_index, spin_info.timestamp)
+
+        }
+    }
 
     // Testing functions
     #[test_only]
