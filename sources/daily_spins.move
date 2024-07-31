@@ -21,6 +21,8 @@ module main::daily_spins {
 
     use std::option;
     use std::signer;
+    use std::vector;
+
     use main::admin;
 
     const EINVALID_COLLECTION: u64 = 1;
@@ -154,6 +156,20 @@ module main::daily_spins {
         // let spin_result_table = spin_capability.spin_result_table;
         let length = aptos_std::smart_table::length(&spin_capability.spin_result_table);
         length
+    }
+
+    #[view]
+    public fun spin_rewards(): vector<u64> acquires SpinData {
+        let spin_capability = borrow_global<SpinData>(@main);
+        let length = aptos_std::smart_table::length(&spin_capability.spin_result_table);
+        let results = vector::empty<u64>();
+        let i = 0;
+        while (i < length) {
+            let rewardElement = spin_reward(i);
+            vector::push_back(&mut results, rewardElement);
+            i = i + 1;
+        };
+        results
     }
 
     #[view]

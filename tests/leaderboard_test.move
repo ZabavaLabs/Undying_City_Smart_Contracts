@@ -9,14 +9,6 @@ module main::leaderboard_test{
     use aptos_framework::block;
     use aptos_framework::account;
 
-
-
-    // use aptos_token_objects::collection;
-    // use aptos_token_objects::token::{Self, Token};
-    // use aptos_token_objects::property_map;
-
-    // use std::error;
-    // use std::option;
     use std::signer;
     use std::vector;
 
@@ -43,15 +35,11 @@ module main::leaderboard_test{
     const EINVALID_TABLE_LENGTH: u64 = 1;
     const EINVALID_SPECIAL_EVENT_DETAIL: u64 = 3;
 
-
     const EEVENT_ID_NOT_FOUND: u64 = 4;
     const EINVALID_DATA: u64 = 5;
 
-
-
     const EINSUFFICIENT_BALANCE: u64 = 65540;
     const TIME_BETWEEN_SPINS: u64 = 24 * 60 * 60 * 1_000_000; 
-
 
     #[test(creator = @main)]
     public fun initialize_leaderboard_for_test(creator: &signer) {
@@ -59,7 +47,6 @@ module main::leaderboard_test{
         omni_cache::initialize_for_test(creator);
         leaderboard::initialize_for_test(creator);
         daily_spins::initialize_for_test(creator);
-
     }
 
     #[test(creator = @main, user1 = @0x456, user2 = @0x678, user3= @0x789, aptos_framework = @aptos_framework)]
@@ -70,7 +57,6 @@ module main::leaderboard_test{
         randomness::initialize_for_testing(aptos_framework);
         randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
-        
         admin::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
         leaderboard::initialize_for_test(creator);
@@ -457,5 +443,27 @@ module main::leaderboard_test{
         daily_spins::spin_wheel_for_test(user2);
         timestamp::update_global_time_for_test(TIME_BETWEEN_SPINS * 11);
         daily_spins::spin_wheel_for_test(user1);
+    }
+
+    #[test(creator = @main, user1 = @0x456, user2 = @0x678, user3= @0x789, user4= @0x781, user5= @0x782, user6= @0x783, user7= @0x784, user8= @0x785, user9= @0x849,user10= @0x852, aptos_framework = @aptos_framework)]
+    public fun test_daily_spin_view_functions(creator: &signer, user1: &signer, user2:&signer, user3:&signer, user4: &signer, user5:&signer, user6:&signer, user7: &signer, user8:&signer, user9:&signer, user10: &signer, aptos_framework: &signer) {
+        enable_cryptography_algebra_natives(aptos_framework);
+        timestamp::set_time_has_started_for_testing(aptos_framework);
+      
+        randomness::initialize_for_testing(aptos_framework);
+        randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+        
+        admin::initialize_for_test(creator);
+        omni_cache::initialize_for_test(creator);
+        leaderboard::initialize_for_test(creator);
+        daily_spins::initialize_for_test(creator);
+        daily_spins::add_result_entry(creator,0, 0);
+        daily_spins::add_result_entry(creator,1, 100);
+        daily_spins::add_result_entry(creator,2, 200);
+        daily_spins::add_result_entry(creator,3, 300);
+
+        let spin_rewards = daily_spins::spin_rewards();
+        debug::print(&spin_rewards[0]);
+
     }
 }
