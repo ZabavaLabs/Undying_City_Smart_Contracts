@@ -463,7 +463,7 @@ module main::leaderboard_test{
         daily_spins::add_result_entry(creator,3, 300);
 
         let spin_rewards = daily_spins::spin_rewards();
-        debug::print(&spin_rewards[0]);
+        debug::print(&spin_rewards);
 
     }
 }

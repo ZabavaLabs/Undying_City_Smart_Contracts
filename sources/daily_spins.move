@@ -42,6 +42,12 @@ module main::daily_spins {
     // 1 Day
     const TIME_BETWEEN_SPINS: u64 = 24 * 60 * 60 * 1_000_000;
 
+    #[event]
+    struct DailySpinEvent has drop, store {
+        receiver: address,
+        random_number: u64,
+        reward: u64
+    }
 
     struct SpinData has key, store {
         address_map: SimpleMap<address, LastSpinInfo>,
@@ -84,19 +90,28 @@ module main::daily_spins {
             user_spin_info = *simple_map::borrow(&spin_capability.address_map,&user_addr);
         };
         let rewards = *smart_table::borrow(&spin_capability.spin_result_table, random_number);
-
+        let total_rewards = rewards;
         let day_index = user_spin_info.day_index;
 
         if (day_index == 2){
-            main::leaderboard::add_score(user_addr, rewards * 2);
+            total_rewards = rewards * 2;
             day_index = day_index + 1;
         } else if (day_index == 6){
-            main::leaderboard::add_score(user_addr, rewards * 3);
+            total_rewards = rewards * 3;
             day_index = 0;
         } else{
-            main::leaderboard::add_score(user_addr, rewards);
             day_index = day_index + 1;
         };
+
+        main::leaderboard::add_score(user_addr, total_rewards);
+
+         let event = DailySpinEvent {
+            receiver: user_addr,
+            random_number: random_number, 
+            reward: total_rewards
+        };
+     
+        0x1::event::emit(event);
 
         let new_spin_info = LastSpinInfo {
             spin_result: random_number,
