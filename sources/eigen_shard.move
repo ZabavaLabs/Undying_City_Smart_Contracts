@@ -14,9 +14,8 @@ module main::eigen_shard {
     use std::signer;
     use std::string::{Self, String};
 
-    // friend main::character;
     friend main::equipment;
-    // friend main::omni_cache;
+    friend main::omni_cache;
 
     use main::admin;
 
@@ -51,7 +50,7 @@ module main::eigen_shard {
     /// The shard collection description
     const EIGEN_SHARD_COLLECTION_DESCRIPTION: vector<u8> = b"This collection stores the Eigen Shard token." ;
     /// The shard collection URI
-    const EIGEN_SHARD_COLLECTION_URI: vector<u8> = b"https://undyingcity.zabavalabs.com/shard/collection";
+    const EIGEN_SHARD_COLLECTION_URI: vector<u8> = b"https://doc.undyingcity.zabavalabs.com";
 
    /// The shard token name
     const EIGEN_SHARD_TOKEN_NAME: vector<u8> = b"Eigen Shard";
@@ -62,7 +61,7 @@ module main::eigen_shard {
     const PROJECT_URI: vector<u8> = b"https://undyingcity.zabavalabs.com";
     //Point to Image
     const PROJECT_ICON_URI: vector<u8> = b"ipfs://bafybeiee6ziwznlaullflnzeqpvvdtweb7pehp572xcafkwawvtun2me4y";
-    const URI: vector<u8> = b"https://github.com/ZabavaLabs/Undying_City_Smart_Contracts";
+    const URI: vector<u8> = b"ipfs://bafybeiee6ziwznlaullflnzeqpvvdtweb7pehp572xcafkwawvtun2me4y";
 
 
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
@@ -110,7 +109,7 @@ module main::eigen_shard {
             company_revenue_address: signer::address_of(caller),
             buy_back_address: signer::address_of(caller),
             minimum_shard_mint_amount: 10,
-            apt_cost_per_shard: 1_000_000
+            apt_cost_per_shard: 1_00_000
         };
 
         move_to(caller, settings);
@@ -295,8 +294,9 @@ module main::eigen_shard {
     // ANCHOR View Functions
     #[view]
     /// Returns the balance of the shard token of the owner
-    public fun shard_balance(owner_addr: address, shard: Object<EigenShardCapability>): u64 {
-        let metadata = object::convert<EigenShardCapability, Metadata>(shard);
+    public fun shard_balance(owner_addr: address): u64 {
+        let shard_object = object::address_to_object(shard_token_address());
+        let metadata = object::convert<EigenShardCapability, Metadata>(shard_object);
         let store = primary_fungible_store::ensure_primary_store_exists(owner_addr, metadata);
         fungible_asset::balance(store)
     }
@@ -332,12 +332,13 @@ module main::eigen_shard {
     }
 
     #[test_only]
-    public fun setup_coin(creator:&signer, user1:&signer, user2:&signer, aptos_framework: &signer){
+    public fun setup_coin(creator:&signer, user1:&signer, user2:&signer, aptos_framework: &signer, amount: u64){
         use aptos_framework::account::create_account_for_test;
         create_account_for_test(signer::address_of(creator));
         create_account_for_test(signer::address_of(user1));
         create_account_for_test(signer::address_of(user2));
 
+        // let (burn_cap, freeze_cap, mint_cap) = initialize_and_register_fake_money(creator, 1, true);
         let (burn_cap, mint_cap) = aptos_framework::aptos_coin::initialize_for_test(aptos_framework);
         coin::register<AptosCoin>(creator);
         coin::register<AptosCoin>(user1);
@@ -346,9 +347,9 @@ module main::eigen_shard {
         // coin::deposit(signer::address_of(user1), coin::mint(10_00_000_000, &mint_cap));
         // coin::deposit(signer::address_of(user2), coin::mint(10_00_000_000, &mint_cap));
 
-        coin::deposit(signer::address_of(creator), coin::mint(100_000_000, &mint_cap));
-        coin::deposit(signer::address_of(user1), coin::mint(100_000_000, &mint_cap));
-        coin::deposit(signer::address_of(user2), coin::mint(100_000_000, &mint_cap));
+        coin::deposit(signer::address_of(creator), coin::mint(amount, &mint_cap));
+        coin::deposit(signer::address_of(user1), coin::mint(amount, &mint_cap));
+        coin::deposit(signer::address_of(user2), coin::mint(amount, &mint_cap));
 
 
         coin::destroy_burn_cap(burn_cap);

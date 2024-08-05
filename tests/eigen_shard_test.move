@@ -47,7 +47,7 @@ module main::eigen_shard_test {
     /// The shard collection description
     const EIGEN_SHARD_COLLECTION_DESCRIPTION: vector<u8> = b"This collection stores the Eigen Shard token." ;
     /// The shard collection URI
-    const EIGEN_SHARD_COLLECTION_URI: vector<u8> = b"https://undyingcity.zabavalabs.com/shard/collection";
+    const EIGEN_SHARD_COLLECTION_URI: vector<u8> = b"https://doc.undyingcity.zabavalabs.com";
 
    /// The shard token name
     const EIGEN_SHARD_TOKEN_NAME: vector<u8> = b"Eigen Shard";
@@ -58,7 +58,7 @@ module main::eigen_shard_test {
     const PROJECT_URI: vector<u8> = b"https://undyingcity.zabavalabs.com";
     //Point to Image
     const PROJECT_ICON_URI: vector<u8> = b"ipfs://bafybeiee6ziwznlaullflnzeqpvvdtweb7pehp572xcafkwawvtun2me4y";
-    const URI: vector<u8> = b"https://github.com/ZabavaLabs/Undying_City_Smart_Contracts";
+    const URI: vector<u8> = b"ipfs://bafybeiee6ziwznlaullflnzeqpvvdtweb7pehp572xcafkwawvtun2me4y";
 
 
     use main::eigen_shard::{Self, EigenShardCapability, ShardCollectionCapability};
@@ -70,7 +70,7 @@ module main::eigen_shard_test {
         assert!(signer::address_of(creator) == @main, 0);
 
         eigen_shard::initialize_for_test(creator);
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
         admin::initialize_for_test(creator);
 
         let user1_addr = signer::address_of(user1);
@@ -78,29 +78,30 @@ module main::eigen_shard_test {
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
 
-        assert!(eigen_shard::shard_balance(user1_addr, shard_token) == 50, 0);
+        assert!(eigen_shard::shard_balance(user1_addr) == 50, 0);
 
     }
     
     #[test(creator = @main, user1 = @0x456, user2 = @0x789, aptos_framework = @aptos_framework)]
     public fun test_shard_mint (creator: &signer, user1: &signer, user2: &signer, aptos_framework: &signer)  {
         eigen_shard::initialize_for_test(creator);
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
+
         admin::initialize_for_test(creator);
 
         let user2_addr = signer::address_of(user2);
 
         eigen_shard::mint_shard(user2, 50);
 
-        let shard_token = object::address_to_object(eigen_shard::shard_token_address());
-        assert!(eigen_shard::shard_balance(user2_addr, shard_token) == 50, 0);
+        assert!(eigen_shard::shard_balance(user2_addr) == 50, 0);
     }
 
 
     #[test(creator = @main, user1 = @0x456, user2 = @0x789, aptos_framework = @aptos_framework)]
     public fun test_shard_sent_correctly (creator: &signer, user1: &signer, user2: &signer, aptos_framework: &signer)  {
         eigen_shard::initialize_for_test(creator);
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
+
         admin::initialize_for_test(creator);
         let creator_addr = signer::address_of(creator);
         let user1_addr = signer::address_of(user1);
@@ -120,17 +121,17 @@ module main::eigen_shard_test {
         // assert!(coin::balance<AptosCoin>(user1_addr) == 11_00_000_000, EINVALID_BALANCE);
         // assert!(coin::balance<AptosCoin>(creator_addr) == 15_50_000_000, EINVALID_BALANCE);
         // assert!(coin::balance<AptosCoin>(user2_addr) == 3_50_000_000, EINVALID_BALANCE);
-        eigen_shard::mint_shard(user2, 50);
+        eigen_shard::mint_shard(user2, 500);
         assert!(coin::balance<AptosCoin>(signer::address_of(user2)) == 50_000_000, EINVALID_BALANCE);
         assert!(coin::balance<AptosCoin>(creator_addr) == 150_000_000, EINVALID_BALANCE);
 
         eigen_shard::set_buy_back_address(creator, user1_addr);
-        eigen_shard::mint_shard(user2, 10);
+        eigen_shard::mint_shard(user2, 100);
         assert!(coin::balance<AptosCoin>(user1_addr) == 105_000_000, EINVALID_BALANCE);
         assert!(coin::balance<AptosCoin>(creator_addr) == 155_000_000, EINVALID_BALANCE);
 
         eigen_shard::set_company_revenue_address(creator, user2_addr);
-        eigen_shard::mint_shard(user2, 10);
+        eigen_shard::mint_shard(user2, 100);
         assert!(coin::balance<AptosCoin>(user1_addr) == 110_000_000, EINVALID_BALANCE);
         assert!(coin::balance<AptosCoin>(creator_addr) == 155_000_000, EINVALID_BALANCE);
         assert!(coin::balance<AptosCoin>(user2_addr) == 35_000_000, EINVALID_BALANCE);
@@ -140,7 +141,7 @@ module main::eigen_shard_test {
     #[expected_failure(abort_code = ENOT_MINIMUM_MINT_AMOUNT, location = main::eigen_shard )]
     public fun test_shard_mint_below_min (creator: &signer, user1: &signer, user2: &signer, aptos_framework: &signer) {
         eigen_shard::initialize_for_test(creator);
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
         admin::initialize_for_test(creator);
 
         let user2_addr = signer::address_of(user2);
@@ -148,14 +149,15 @@ module main::eigen_shard_test {
         eigen_shard::mint_shard(user2, 8);
 
         let shard_token = object::address_to_object<EigenShardCapability>(eigen_shard::shard_token_address());
-        assert!(eigen_shard::shard_balance(user2_addr, shard_token) == 8, 0);
+        assert!(eigen_shard::shard_balance(user2_addr) == 8, 0);
 
     }
 
     #[test(creator = @main, user1 = @0x456, user2 = @0x789, aptos_framework = @aptos_framework)]
     public fun test_set_token_name (creator: &signer, user1: &signer, user2: &signer, aptos_framework: &signer) {
         eigen_shard::initialize_for_test(creator);
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
+
         admin::initialize_for_test(creator);
 
         let creator_addr = signer::address_of(creator);
@@ -180,7 +182,8 @@ module main::eigen_shard_test {
     #[test(creator = @main, user1 = @0x456, user2 = @0x789, aptos_framework = @aptos_framework)]
     public fun test_set_collection (creator: &signer, user1: &signer, user2: &signer, aptos_framework: &signer) {
         eigen_shard::initialize_for_test(creator);
-        eigen_shard::setup_coin(creator, user1, user2, aptos_framework);
+        eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
+
         admin::initialize_for_test(creator);
 
         let creator_addr = signer::address_of(creator);
