@@ -393,7 +393,7 @@ module main::equipment{
         object::address_to_object(signer::address_of(&token_signer))
     }
    
-    // Need to remove friend for testnet because signature
+    // TODO: Need to remove friend for testnet because signature
     public(friend) entry fun upgrade_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, amount: u64) acquires EquipmentCapability,  EquipmentData {
         assert!(object::is_owner(equipment_object, signer::address_of(from)), ENOT_OWNER);
         assert!(amount>0, EINVALID_PROPERTY_VALUE);
@@ -521,7 +521,6 @@ module main::equipment{
         0x1::event::emit(event);
     }
     
-    // TODO: Test this function
     public entry fun destroy_equipment(from: &signer, equipment_object: Object<EquipmentCapability>) acquires EquipmentCapability, ResourceCapability{
         assert!(object::is_owner(equipment_object, signer::address_of(from)), ENOT_OWNER);
         object::transfer(from , equipment_object, capability_address());
