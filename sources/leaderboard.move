@@ -145,6 +145,12 @@ module main::leaderboard {
     }
 
     #[view]
+    public fun end_time(): u64 acquires LeaderboardStruct {
+        let end_time = borrow_global<LeaderboardStruct>(@main).end_time;
+        end_time
+    }
+
+    #[view]
     public fun user_score(user_addr:address): u64 acquires LeaderboardStruct {
         let leaderboardStruct = borrow_global<LeaderboardStruct>(@main);
         let contains_key = aptos_std::simple_map::contains_key(&leaderboardStruct.score_map, &user_addr);
