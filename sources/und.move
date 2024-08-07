@@ -14,8 +14,6 @@ module main::und {
     use std::signer;
     use std::string::{Self, String};
 
-    friend main::equipment;
-    friend main::omni_cache;
 
     use main::admin;
 

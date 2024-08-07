@@ -115,7 +115,7 @@ module main::und_test {
     }
 
     #[test(creator = @main, user1 = @0x456, user2 = @0x789, aptos_framework = @aptos_framework)]
-    #[expected_failure(abort_code = ENOT_ADMIN, location = main::admin )]
+    #[expected_failure(abort_code = 1, location = main::admin )]
     public fun test_unauthorzed_mint (creator: &signer, user1: &signer, user2: &signer, aptos_framework: &signer)  {
         assert!(signer::address_of(creator) == @main, 0);
 
