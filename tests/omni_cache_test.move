@@ -26,12 +26,11 @@ module main::omni_cache_test{
     use main::eigen_shard::{Self, EigenShardCapability};
     use main::omni_cache;
     use main::admin;
-    use main::pseudorandom::{Self};
     use main::equipment;
 
-    // use aptos_framework::randomness;
-    // #[test_only]
-    // use aptos_std::crypto_algebra::enable_cryptography_algebra_natives;
+    use aptos_framework::randomness;
+    #[test_only]
+    use aptos_std::crypto_algebra::enable_cryptography_algebra_natives;
 
     const EINVALID_TABLE_LENGTH: u64 = 1;
     const EWHITELIST_AMOUNT: u64 = 2;
@@ -93,34 +92,20 @@ module main::omni_cache_test{
         assert!(returned_start_time ==new_start_time, EINVALID_SPECIAL_EVENT_DETAIL);
         assert!(returned_end_time ==new_end_time, EINVALID_SPECIAL_EVENT_DETAIL);
 
-        // ISSUES WITH TABLE STUFF
-        // omni_cache::add_special_event(creator,string::utf8(b"Event 1"), timestamp, timestamp + 100_000_000);
-        // omni_cache::upsert_whitelist_address(creator, 0, signer::address_of(user1), 10);    
-
-        // assert!(omni_cache::get_special_events_table_length()==1, EINVALID_TABLE_LENGTH);
-        // assert!(omni_cache::whitelist_map_contains(0, signer::address_of(user1))==true,999);
-        // assert!(omni_cache::get_whitelist_address_amount(0, signer::address_of(user1))==10, EWHITELIST_AMOUNT);
-       
-        // omni_cache::add_special_event(creator,string::utf8(b"Event 2"), 120, 1000);
-        // omni_cache::upsert_whitelist_address(creator,1, signer::address_of(user1), 20);
-        // assert!(omni_cache::get_special_events_table_length()==2, EINVALID_TABLE_LENGTH);
-        // assert!(omni_cache::get_whitelist_address_amount(1, signer::address_of(user1))==20, EWHITELIST_AMOUNT);
-
     }
 
     #[test(creator = @main, user1 = @0x456, user2 = @0x678, user3= @0x789, aptos_framework = @aptos_framework)]
-    #[expected_failure(abort_code = 65537, location = main::pseudorandom)]
+    #[expected_failure(arithmetic_error, location = aptos_framework::randomness)]
     public fun test_unlock_cache_no_equipment_added(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
         admin::initialize_for_test(creator);
-        pseudorandom::initialize_for_test(creator);
         eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
 
-        // randomness::initialize_for_testing(aptos_framework);
-        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+        randomness::initialize_for_testing(aptos_framework);
+        randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
@@ -191,15 +176,14 @@ module main::omni_cache_test{
     #[test(creator = @main, user1 = @0x456, user2 = @0x678, user3= @0x789, aptos_framework = @aptos_framework)]
     public fun test_unlock_cache(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
         admin::initialize_for_test(creator);
-        pseudorandom::initialize_for_test(creator);
         eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
 
-        // randomness::initialize_for_testing(aptos_framework);
-        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+        randomness::initialize_for_testing(aptos_framework);
+        randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
@@ -266,15 +250,14 @@ module main::omni_cache_test{
     #[expected_failure(abort_code = 9, location = main::eigen_shard)]
     public fun test_unlock_cache_insufficient_shard(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
         admin::initialize_for_test(creator);
-        pseudorandom::initialize_for_test(creator);
         eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
 
-        // randomness::initialize_for_testing(aptos_framework);
-        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+        randomness::initialize_for_testing(aptos_framework);
+        randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
@@ -315,15 +298,14 @@ module main::omni_cache_test{
     #[test(creator = @main, user1 = @0x456, user2 = @0x678, user3= @0x789, aptos_framework = @aptos_framework)]
     public fun test_unlock_cache_via_event(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
         admin::initialize_for_test(creator);
-        pseudorandom::initialize_for_test(creator);
         eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
 
-        // randomness::initialize_for_testing(aptos_framework);
-        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+        randomness::initialize_for_testing(aptos_framework);
+        randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
@@ -364,15 +346,14 @@ module main::omni_cache_test{
     #[test(creator = @main, user1 = @0x456, user2 = @0x678, user3= @0x789, aptos_framework = @aptos_framework)]
     public fun test_unlock_cache_via_event_2(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
         admin::initialize_for_test(creator);
-        pseudorandom::initialize_for_test(creator);
         eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
 
-        // randomness::initialize_for_testing(aptos_framework);
-        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+        randomness::initialize_for_testing(aptos_framework);
+        randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
@@ -452,14 +433,13 @@ module main::omni_cache_test{
     #[test(creator = @main, user1 = @0x456, user2 = @0x678, user3= @0x789, aptos_framework = @aptos_framework)]
     public fun test_unlock_cache_x10(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
         admin::initialize_for_test(creator);
-        pseudorandom::initialize_for_test(creator);
         eigen_shard::setup_coin(creator, user1, user2, aptos_framework,100_00_000_000);
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
 
-        // randomness::initialize_for_testing(aptos_framework);
-        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+        randomness::initialize_for_testing(aptos_framework);
+        randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
@@ -525,15 +505,14 @@ module main::omni_cache_test{
     #[test(creator = @main, user1 = @0x456, user2 = @0x678, user3= @0x789, aptos_framework = @aptos_framework)]
     public fun test_modify_omni_cache(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
         admin::initialize_for_test(creator);
-        pseudorandom::initialize_for_test(creator);
         eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
 
-        // randomness::initialize_for_testing(aptos_framework);
-        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+        randomness::initialize_for_testing(aptos_framework);
+        randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
@@ -565,15 +544,14 @@ module main::omni_cache_test{
     #[test(creator = @main, user1 = @0x456, user2 = @0x678, user3= @0x789, aptos_framework = @aptos_framework)]
     public fun test_modify_omni_cache_mint(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
         admin::initialize_for_test(creator);
-        pseudorandom::initialize_for_test(creator);
         eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
 
-        // randomness::initialize_for_testing(aptos_framework);
-        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+        randomness::initialize_for_testing(aptos_framework);
+        randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
@@ -664,15 +642,14 @@ module main::omni_cache_test{
     #[expected_failure(abort_code=6, location=main::omni_cache)]
     public fun test_unlock_extra_cache_via_event(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
         admin::initialize_for_test(creator);
-        pseudorandom::initialize_for_test(creator);
         eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
 
-        // randomness::initialize_for_testing(aptos_framework);
-        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+        randomness::initialize_for_testing(aptos_framework);
+        randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
@@ -713,14 +690,13 @@ module main::omni_cache_test{
     #[expected_failure(abort_code=8, location=main::omni_cache)]
     public fun test_unlock_cache_via_event_past_time(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
         admin::initialize_for_test(creator);
-        pseudorandom::initialize_for_test(creator);
         eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
-        // randomness::initialize_for_testing(aptos_framework);
-        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+        randomness::initialize_for_testing(aptos_framework);
+        randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);
@@ -758,14 +734,13 @@ module main::omni_cache_test{
     #[test(creator = @main, user1 = @0x456, user2 = @0x678, user3= @0x789, aptos_framework = @aptos_framework)]
     public fun test_unlock_cache_view_function(creator: &signer, user1: &signer, user2:&signer, user3:&signer, aptos_framework: &signer) {
         admin::initialize_for_test(creator);
-        pseudorandom::initialize_for_test(creator);
         eigen_shard::setup_coin(creator, user1, user2, aptos_framework, 100_000_000);
 
         eigen_shard::initialize_for_test(creator);
         equipment::initialize_for_test(creator);
         omni_cache::initialize_for_test(creator);
-        // randomness::initialize_for_testing(aptos_framework);
-        // randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
+        randomness::initialize_for_testing(aptos_framework);
+        randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000001");
 
         account::create_account_for_test(@aptos_framework);
         timestamp::set_time_has_started_for_testing(aptos_framework);

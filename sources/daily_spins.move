@@ -36,15 +36,13 @@ module main::daily_spins {
 
     // Error Codes
 
-
     const EUNABLE_TO_CLAIM: u64 = 6;
 
     // 1 Day
     const TIME_BETWEEN_SPINS: u64 = 24 * 60 * 60 * 1_000_000;
-    
+
     // Commented out as it only used for testing
     // const TIME_BETWEEN_SPINS: u64 = 60 * 1_000_000;
-
 
     #[event]
     struct DailySpinEvent has drop, store {
@@ -67,7 +65,7 @@ module main::daily_spins {
     fun init_module(deployer: &signer) {
         let address_map = aptos_std::simple_map::new<address, LastSpinInfo>();
         let spin_result_table = aptos_std::smart_table::new<u64, u64>();
-        let address_map = SpinData { address_map: address_map, spin_result_table};
+        let address_map = SpinData { address_map: address_map, spin_result_table };
         move_to(deployer, address_map);
     }
 
@@ -80,41 +78,38 @@ module main::daily_spins {
         let user_addr = signer::address_of(user);
         debug::print(&utf8(b"spin random number was:"));
         debug::print(&random_number);
-        
+
         let spin_capability = borrow_global_mut<SpinData>(@main);
 
         let user_spin_info;
-        if (!simple_map::contains_key(&spin_capability.address_map, &user_addr)){
-            user_spin_info = LastSpinInfo {
-                spin_result: 0,
-                day_index: 0,
-                timestamp: 0 
-            }
-        } else{
-            user_spin_info = *simple_map::borrow(&spin_capability.address_map,&user_addr);
+        if (!simple_map::contains_key(&spin_capability.address_map, &user_addr)) {
+            user_spin_info = LastSpinInfo { spin_result: 0, day_index: 0, timestamp: 0 }
+        } else {
+            user_spin_info = *simple_map::borrow(&spin_capability.address_map, &user_addr);
         };
-        let rewards = *smart_table::borrow(&spin_capability.spin_result_table, random_number);
+        let rewards =
+            *smart_table::borrow(&spin_capability.spin_result_table, random_number);
         let total_rewards = rewards;
         let day_index = user_spin_info.day_index;
 
-        if (day_index == 2){
+        if (day_index == 2) {
             total_rewards = rewards * 2;
             day_index = day_index + 1;
-        } else if (day_index == 6){
+        } else if (day_index == 6) {
             total_rewards = rewards * 3;
             day_index = 0;
-        } else{
+        } else {
             day_index = day_index + 1;
         };
 
         main::leaderboard::add_score(user_addr, total_rewards);
 
-         let event = DailySpinEvent {
+        let event = DailySpinEvent {
             receiver: user_addr,
-            random_number: random_number, 
+            random_number: random_number,
             reward: total_rewards
         };
-     
+
         0x1::event::emit(event);
 
         let new_spin_info = LastSpinInfo {
@@ -126,19 +121,23 @@ module main::daily_spins {
         // debug::print(&new_spin_info.day_index);
         // debug::print(&new_spin_info.timestamp);
 
-        aptos_std::simple_map::upsert(&mut spin_capability.address_map, user_addr, new_spin_info);
+        aptos_std::simple_map::upsert(
+            &mut spin_capability.address_map, user_addr, new_spin_info
+        );
 
     }
 
-    public(friend) entry fun add_result_entry(caller:&signer, key: u64, reward:u64) acquires SpinData{
+    public(friend) entry fun add_result_entry(
+        caller: &signer, key: u64, reward: u64
+    ) acquires SpinData {
         let caller_address = signer::address_of(caller);
         admin::assert_is_admin(caller_address);
         let spin_capability = borrow_global_mut<SpinData>(@main);
         let spin_result_table = &mut spin_capability.spin_result_table;
-        smart_table::add(spin_result_table,key,reward);
+        smart_table::add(spin_result_table, key, reward);
     }
 
-    public(friend) entry fun clear_table(caller:&signer) acquires SpinData{
+    public(friend) entry fun clear_table(caller: &signer) acquires SpinData {
         let caller_address = signer::address_of(caller);
         admin::assert_is_admin(caller_address);
         let spin_capability = borrow_global_mut<SpinData>(@main);
@@ -157,11 +156,12 @@ module main::daily_spins {
         if (!contains_key) {
             output = true;
         } else {
-            let nft_spin_info: LastSpinInfo = *aptos_std::simple_map::borrow(&address_map, &user_addr);
+            let nft_spin_info: LastSpinInfo = *aptos_std::simple_map::borrow(
+                &address_map, &user_addr
+            );
             if (timestamp::now_microseconds() > nft_spin_info.timestamp + TIME_BETWEEN_SPINS) {
                 output = true;
-            }
-            else {
+            } else {
                 output = false
             };
 
@@ -173,14 +173,16 @@ module main::daily_spins {
     public fun spin_result_table_length(): u64 acquires SpinData {
         let spin_capability = borrow_global<SpinData>(@main);
         // let spin_result_table = spin_capability.spin_result_table;
-        let length = aptos_std::smart_table::length(&spin_capability.spin_result_table);
+        let length =
+            aptos_std::smart_table::length(&spin_capability.spin_result_table);
         length
     }
 
     #[view]
     public fun spin_rewards(): vector<u64> acquires SpinData {
         let spin_capability = borrow_global<SpinData>(@main);
-        let length = aptos_std::smart_table::length(&spin_capability.spin_result_table);
+        let length =
+            aptos_std::smart_table::length(&spin_capability.spin_result_table);
         let results = vector::empty<u64>();
         let i = 0;
         while (i < length) {
@@ -192,47 +194,41 @@ module main::daily_spins {
     }
 
     #[view]
-    public fun spin_reward(key:u64): u64 acquires SpinData {
+    public fun spin_reward(key: u64): u64 acquires SpinData {
         let spin_capability = borrow_global<SpinData>(@main);
-        let reward = *smart_table::borrow(&spin_capability.spin_result_table,key);
+        let reward = *smart_table::borrow(&spin_capability.spin_result_table, key);
         reward
     }
 
     #[view]
-    public fun previous_spin_result(user_addr:address): u64 acquires SpinData {
+    public fun previous_spin_result(user_addr: address): u64 acquires SpinData {
         let spin_capability = borrow_global<SpinData>(@main);
-        if (!simple_map::contains_key(&spin_capability.address_map, &user_addr)){
-            0
-        }else{
-            let spin_info = *simple_map::borrow(&spin_capability.address_map,&user_addr);
+        if (!simple_map::contains_key(&spin_capability.address_map, &user_addr)) { 0 }
+        else {
+            let spin_info = *simple_map::borrow(&spin_capability.address_map, &user_addr);
             spin_info.spin_result
         }
     }
 
     #[view]
-    public fun previous_spin_time(user_addr:address): u64 acquires SpinData {
+    public fun previous_spin_time(user_addr: address): u64 acquires SpinData {
         let spin_capability = borrow_global<SpinData>(@main);
-        if (!simple_map::contains_key(&spin_capability.address_map, &user_addr)){
-            0
-        }else{
-            let spin_info = *simple_map::borrow(&spin_capability.address_map,&user_addr);
+        if (!simple_map::contains_key(&spin_capability.address_map, &user_addr)) { 0 }
+        else {
+            let spin_info = *simple_map::borrow(&spin_capability.address_map, &user_addr);
             spin_info.timestamp
         }
     }
 
-  
     #[view]
-    public fun last_spin_info(user_addr:address): (u64,u8,u64) acquires SpinData {
+    public fun last_spin_info(user_addr: address): (u64, u8, u64) acquires SpinData {
         let spin_capability = borrow_global<SpinData>(@main);
-        if (!simple_map::contains_key(&spin_capability.address_map, &user_addr)){
-            let output = LastSpinInfo{
-                spin_result: 0,
-                day_index: 0,
-                timestamp: 0
-            };
+        if (!simple_map::contains_key(&spin_capability.address_map, &user_addr)) {
+            let output =
+                LastSpinInfo { spin_result: 0, day_index: 0, timestamp: 0 };
             (output.spin_result, output.day_index, output.timestamp)
-        }else{
-            let spin_info = *simple_map::borrow(&spin_capability.address_map,&user_addr);
+        } else {
+            let spin_info = *simple_map::borrow(&spin_capability.address_map, &user_addr);
             (spin_info.spin_result, spin_info.day_index, spin_info.timestamp)
 
         }
@@ -248,5 +244,4 @@ module main::daily_spins {
     public fun spin_wheel_for_test(caller: &signer) acquires SpinData {
         spin_wheel(caller);
     }
-
 }

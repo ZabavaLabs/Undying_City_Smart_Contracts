@@ -1,5 +1,3 @@
-/// This module implements the the shard tokens (fungible token). When the module initializes,
-/// it creates the collection and two fungible tokens such as Corn and Meat.
 module main::token_lock {
     use aptos_framework::account::{Self, SignerCapability};
     use aptos_framework::object::{Self, Object};
@@ -24,32 +22,17 @@ module main::token_lock {
 
     /// The token does not exist
     const ETOKEN_DOES_NOT_EXIST: u64 = 1;
-    /// The provided signer is not the creator
     const ENOT_FINALIZED: u64 = 2;
-
     const ECLIFF_NOT_PASSED: u64 = 3;
     const EBALANCE_ZERO: u64 = 4;
 
     const EPERIOD_NOT_PASSED: u64 = 5;
-
-    // The caller is not the admin
-    const ENOT_ADMIN: u64 = 8;
-    // The minimum mintable amount requirement is not met.
-    const ENOT_MINIMUM_MINT_AMOUNT: u64 = 9;
-
-    const ENOT_EVEN: u64 = 10;
-
     const EINVALID_DATA: u64 = 11;
-
-    const ETOKEN_CONFIG_FINALIZED: u64 = 12;
-
     const APP_SIGNER_CAPABILITY_SEED: vector<u8> = b"TOKEN_LOCK_SIGNER_CAPABILITY";
-
     const DAY_IN_MICROSECONDS: u64 = 24 * 60 * 60 * 1000_000;
 
     // TODO: ADD EVENT FOR TOKEN LOCK ROW ADDED
     // TODO: ADD EVENT FOR TOKENS CLAIMED
-
 
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     struct TokenLockCapability has key {
@@ -119,7 +102,6 @@ module main::token_lock {
         primary_fungible_store::transfer(from, token_obj, capability_address(), amount);
         let token_lock_table =
             &mut borrow_global_mut<TokenLockCapability>(capability_address()).token_lock_table;
-
 
         let token_lock_table_length = aptos_std::smart_table::length(token_lock_table);
         let caller_addr = signer::address_of(from);
@@ -206,14 +188,18 @@ module main::token_lock {
             locked_token_row.initial_amount - locked_token_row.balance_amount;
         let target_claim_amount =
             (
-                ((timestamp::now_microseconds() - locked_token_row.cliff_timestamp) * locked_token_row.initial_amount) / locked_token_row.vesting_duration
-            ) ;
+                (
+                    (timestamp::now_microseconds() - locked_token_row.cliff_timestamp) * locked_token_row
+                    .initial_amount
+                ) / locked_token_row.vesting_duration
+            );
         if (target_claim_amount > locked_token_row.initial_amount) {
             target_claim_amount = locked_token_row.initial_amount
         };
 
         let amount = target_claim_amount - claimed_amount;
-        let min_claim_amount = locked_token_row.initial_amount * locked_token_row.periodicity / locked_token_row.vesting_duration;
+        let min_claim_amount = locked_token_row.initial_amount * locked_token_row.periodicity
+            / locked_token_row.vesting_duration;
         // debug::print(&utf8(b"timeDiff:"));
         // debug::print(&(timestamp::now_microseconds() - locked_token_row.cliff_timestamp));
         // debug::print(&utf8(b"vesting duration:"));
@@ -226,9 +212,8 @@ module main::token_lock {
         // debug::print(&amount);
         // debug::print(&utf8(b"min_claim_amount:"));
         // debug::print(&min_claim_amount);
-        
-        assert!(amount >= min_claim_amount, EPERIOD_NOT_PASSED);
 
+        assert!(amount >= min_claim_amount, EPERIOD_NOT_PASSED);
 
         locked_token_row.balance_amount = locked_token_row.balance_amount - amount;
         locked_token_row.last_claimed_timestamp = timestamp::now_microseconds();
@@ -259,11 +244,9 @@ module main::token_lock {
     //     locked_tokens_config.finalized = true;
     // }
 
- 
-
     fun get_signer(): signer acquires TokenLockCapability {
         account::create_signer_with_capability(
-            &borrow_global<TokenLockCapability>(capability_address()).signer_cap
+            &borrow_global<TokenLockCapability>(capability_address()).signer_cap,
         )
     }
 
@@ -280,10 +263,12 @@ module main::token_lock {
         let user_smart_table_length = smart_table::length(user_smart_table);
         let output: vector<LockedTokenRow> = vector::empty();
         let i = 0;
-        
+
         while (i < user_smart_table_length) {
             let row_id = smart_table::borrow(user_smart_table, i);
-            let token_lock_table = &borrow_global<TokenLockCapability>(capability_address()).token_lock_table;
+            let token_lock_table = &borrow_global<TokenLockCapability>(
+                capability_address()
+            ).token_lock_table;
             let locked_token_row = *smart_table::borrow(token_lock_table, *row_id);
             vector::push_back(&mut output, locked_token_row);
             i = i + 1;
@@ -300,10 +285,12 @@ module main::token_lock {
         let output: vector<LockedTokenRow> = vector::empty();
         let i = 0;
         // let len = vector::length(&keys);
-        
+
         while (i < token_smart_table_length) {
             let row_id = smart_table::borrow(token_smart_table, i);
-            let token_lock_table = &borrow_global<TokenLockCapability>(capability_address()).token_lock_table;
+            let token_lock_table = &borrow_global<TokenLockCapability>(
+                capability_address()
+            ).token_lock_table;
             let locked_token_row = *smart_table::borrow(token_lock_table, *row_id);
             // let locked_token_row = get_token_lock_row(*row_id);
             vector::push_back(&mut output, locked_token_row);
