@@ -1,5 +1,3 @@
-/// This module implements the the shard tokens (fungible token). When the module initializes,
-/// it creates the collection and two fungible tokens such as Corn and Meat.
 module main::und {
     use aptos_framework::fungible_asset::{Self, Metadata};
     use aptos_framework::object::{Self, Object};
@@ -19,28 +17,6 @@ module main::und {
 
     /// The token does not exist
     const ETOKEN_DOES_NOT_EXIST: u64 = 1;
-    /// The provided signer is not the creator
-    const ENOT_CREATOR: u64 = 2;
-    /// Attempted to mutate an immutable field
-    const EFIELD_NOT_MUTABLE: u64 = 3;
-    /// Attempted to burn a non-burnable token
-    const ETOKEN_NOT_BURNABLE: u64 = 4;
-    /// Attempted to mutate a property map that is not mutable
-    const EPROPERTIES_NOT_MUTABLE: u64 = 5;
-    // The collection does not exist
-    const ECOLLECTION_DOES_NOT_EXIST: u64 = 6;
-
-    const EINVALID_BALANCE: u64 = 7;
-
-
-    // The caller is not the admin
-    const ENOT_ADMIN: u64 = 8;
-    // The minimum mintable amount requirement is not met.
-    const ENOT_MINIMUM_MINT_AMOUNT: u64 = 9;
-
-    const ENOT_EVEN: u64 = 10;
-
-    const EINVALID_DATA: u64 = 11;
 
 
     /// The collection name

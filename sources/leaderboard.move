@@ -15,7 +15,6 @@ module main::leaderboard {
 
     use main::admin::{Self, ENOT_ADMIN};
 
-
     use aptos_framework::timestamp;
 
     use std::string::utf8;
@@ -25,18 +24,9 @@ module main::leaderboard {
     use std::option;
     use std::signer;
 
-    const EINVALID_COLLECTION: u64 = 1;
-    const ECLAIM_FIRST: u64 = 2;
-
     use std::vector;
 
     // Error Codes
-    const ENOT_DEPLOYER: u64 = 1;
-    const ENOT_OWNER: u64 = 2;
-    const ENFT_ID_NOT_FOUND: u64 = 3;
-    const EUNABLE_TO_MINT: u64 = 4;
-    const EWEIGHT_ZERO: u64 = 5;
-    const EUNABLE_TO_CLAIM: u64 = 6;
     const ELEADERBOARD_SEASON_ENDED:u64 = 7;
 
     struct LeaderboardStruct has key, store {

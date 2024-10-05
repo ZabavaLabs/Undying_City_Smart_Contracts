@@ -11,17 +11,12 @@ module main::equipment{
     use aptos_token_objects::royalty::{Self, Royalty};
     use aptos_token_objects::property_map;
 
-    // use aptos_framework::fungible_asset::{Self, Metadata};
-    // use aptos_framework::primary_fungible_store;
-
-    // use std::error;
     use std::option;
     use std::signer;
     use std::vector;
     use std::bcs;
-    // use std::signer::address_of;
+
     use std::string::{Self, String};
-    // use aptos_std::string_utils::{to_string};
 
     use main::eigen_shard::{Self, EigenShardCapability};
 
@@ -38,14 +33,10 @@ module main::equipment{
 
     const ENOT_OWNER: u64 = 2;
     const ECHAR_ID_NOT_FOUND: u64 = 3;
-    const EINVALID_TABLE_LENGTH: u64 = 4;
     const EINVALID_PROPERTY_VALUE: u64 = 5;
-    const EINVALID_BALANCE: u64 = 6;
     const EMAX_LEVEL: u64 = 7;
     const EINVALID_COLLECTION: u64 = 8;
-    const EINVALID_EQUIPMENT: u64 = 9;
-    const EINSUFFICIENT_BALANCE: u64 = 65540;
-    
+    const EINVALID_EQUIPMENT: u64 = 9;   
 
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     struct EquipmentData has key {

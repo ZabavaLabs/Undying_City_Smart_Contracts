@@ -2,15 +2,12 @@ module main::omni_cache{
 
     use aptos_std::smart_table::{Self, SmartTable};
     use aptos_std::simple_map::{Self, SimpleMap};
-
-
     // use std::error;
     // use std::option;
     use std::signer;
     use aptos_framework::object::{Self, Object};
     use aptos_framework::timestamp;
 
-   
     use std::string::{Self, String};
     // use aptos_std::string_utils::{to_string};
 
@@ -23,18 +20,10 @@ module main::omni_cache{
     #[test_only]
     friend main::omni_cache_test;
 
-
-    const ENOT_OWNER: u64 = 2;
-    const EEVENT_ID_NOT_FOUND: u64 = 3;
     const EINVALID_TABLE_LENGTH: u64 = 4;
-    const EINVALID_PROPERTY_VALUE: u64 = 5;
     const EINVALID_BALANCE: u64 = 6;
-
-    const EMAX_LEVEL: u64 = 7;
     const EINVALID_PERIOD: u64 = 8;
 
-    const EINSUFFICIENT_BALANCE: u64 = 65540;
-    
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     struct OmniCacheData has key {
         shards_to_unlock_cache: u64,
