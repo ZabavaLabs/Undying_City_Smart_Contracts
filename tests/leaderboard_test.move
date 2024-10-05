@@ -25,7 +25,6 @@ module main::leaderboard_test{
     use main::eigen_shard::{Self, EigenShardCapability};
     use main::omni_cache::{Self};
     use main::admin::{Self};
-    use main::pseudorandom::{Self};
     use main::equipment::{Self};
     use main::leaderboard::{Self, LeaderboardElement};
     use main::daily_spins::{Self, EUNABLE_TO_SPIN};
