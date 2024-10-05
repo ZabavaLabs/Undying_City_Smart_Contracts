@@ -406,10 +406,10 @@ module main::leaderboard_test{
       
         let prev_score = 0;
         let score = 0;
-        timestamp::update_global_time_for_test((TIME_BETWEEN_SPINS + 1)  + 100);
+        timestamp::update_global_time_for_test(TIME_BETWEEN_SPINS );
         daily_spins::spin_wheel_for_test(user1);
         daily_spins::spin_wheel_for_test(user2);
-        timestamp::update_global_time_for_test((TIME_BETWEEN_SPINS + 1)  + 100 + TIME_BETWEEN_SPINS);
+        timestamp::update_global_time_for_test(TIME_BETWEEN_SPINS + TIME_BETWEEN_SPINS - 1000);
         daily_spins::spin_wheel_for_test(user1);
     }
 

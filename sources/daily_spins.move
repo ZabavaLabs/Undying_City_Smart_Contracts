@@ -41,6 +41,10 @@ module main::daily_spins {
 
     // 1 Day
     const TIME_BETWEEN_SPINS: u64 = 24 * 60 * 60 * 1_000_000;
+    
+    // Commented out as it only used for testing
+    // const TIME_BETWEEN_SPINS: u64 = 60 * 1_000_000;
+
 
     #[event]
     struct DailySpinEvent has drop, store {
