@@ -16,9 +16,9 @@ module main::omni_cache{
 
     use main::eigen_shard::{Self, EigenShardCapability};
     use main::admin::{Self};
-    use main::pseudorandom;
+    // use main::pseudorandom;
     use main::equipment;
-    // use aptos_framework::randomness;
+    use aptos_framework::randomness;
 
 
     #[test_only]
@@ -121,7 +121,7 @@ module main::omni_cache{
     // }
 
   
-
+    #[randomness]
     public(friend) entry fun unlock_cache(account:&signer) acquires OmniCacheData, SpecialEquipmentCacheData, NormalEquipmentCacheData{
         let omni_cache_data = borrow_global<OmniCacheData>(@main);
         let shards_spend = omni_cache_data.shards_to_unlock_cache;
@@ -130,6 +130,7 @@ module main::omni_cache{
         random_mint(account);
     }
 
+    #[randomness]
     public(friend) entry fun unlock_cache_10x(account:&signer) acquires OmniCacheData, SpecialEquipmentCacheData, NormalEquipmentCacheData{
         let omni_cache_data = borrow_global<OmniCacheData>(@main);
         // TODO: Temporary adjust this to 20 for testing. Final should be 880
@@ -143,6 +144,7 @@ module main::omni_cache{
         };
     }
 
+    #[randomness]
     public(friend) entry fun unlock_cache_via_event(account:&signer) acquires OmniCacheData, SpecialEquipmentCacheData, NormalEquipmentCacheData, SpecialEventsInfoEntry{
         let omni_cache_data = borrow_global<OmniCacheData>(@main);
         
@@ -248,21 +250,21 @@ module main::omni_cache{
         let normal_equipment_weight = omni_cache_data.normal_equipment_weight;
         let special_equipment_weight = omni_cache_data.special_equipment_weight;
 
-        let random_number = pseudorandom::rand_u64_range(&account_addr, 1, normal_equipment_weight + special_equipment_weight + 1);
-        // let random_number = randomness::u64_range(1, normal_equipment_weight + special_equipment_weight + 1);
+        // let random_number = pseudorandom::rand_u64_range(&account_addr, 1, normal_equipment_weight + special_equipment_weight + 1);
+        let random_number = randomness::u64_range(1, normal_equipment_weight + special_equipment_weight + 1);
         if (random_number <= normal_equipment_weight){
             let normal_equipment_cache_table = &borrow_global<NormalEquipmentCacheData>(@main).table;
             let normal_equipment_cache_table_length:u64 = aptos_std::smart_table::length(normal_equipment_cache_table);
-            let row_id = pseudorandom::rand_u64_range(&account_addr, 0, normal_equipment_cache_table_length);
-            // let row_id = randomness::u64_range(0, normal_equipment_cache_table_length);
+            // let row_id = pseudorandom::rand_u64_range(&account_addr, 0, normal_equipment_cache_table_length);
+            let row_id = randomness::u64_range(0, normal_equipment_cache_table_length);
 
             let random_equipment_id:u64 = *smart_table::borrow(normal_equipment_cache_table, row_id);
             equipment::mint_equipment(account, random_equipment_id);
         } else{
             let special_equipment_cache_table = &borrow_global<SpecialEquipmentCacheData>(@main).table;
             let special_equipment_cache_table_length:u64 = aptos_std::smart_table::length(special_equipment_cache_table);
-            let row_id = pseudorandom::rand_u64_range(&account_addr, 0, special_equipment_cache_table_length);
-            // let row_id = randomness::u64_range(0, special_equipment_cache_table_length);
+            // let row_id = pseudorandom::rand_u64_range(&account_addr, 0, special_equipment_cache_table_length);
+            let row_id = randomness::u64_range(0, special_equipment_cache_table_length);
 
             let random_equipment_id:u64 = *smart_table::borrow(special_equipment_cache_table, row_id);
             equipment::mint_equipment(account, random_equipment_id);
