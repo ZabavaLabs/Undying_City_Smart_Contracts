@@ -40,8 +40,10 @@ module main::daily_spins {
     const EUNABLE_TO_CLAIM: u64 = 6;
 
     // 1 Day
-    // const TIME_BETWEEN_SPINS: u64 = 24 * 60 * 60 * 1_000_000;
-    const TIME_BETWEEN_SPINS: u64 = 60 * 1_000_000;
+    const TIME_BETWEEN_SPINS: u64 = 24 * 60 * 60 * 1_000_000;
+    
+    // Commented out as it only used for testing
+    // const TIME_BETWEEN_SPINS: u64 = 60 * 1_000_000;
 
 
     #[event]
