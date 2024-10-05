@@ -74,9 +74,8 @@ module main::token_lock {
 
     /// Initializes the module, creating the shard collection.
     fun init_module(caller: &signer) {
-        let (signer_resource, signer_cap) = account::create_resource_account(
-            caller, APP_SIGNER_CAPABILITY_SEED
-        );
+        let (signer_resource, signer_cap) =
+            account::create_resource_account(caller, APP_SIGNER_CAPABILITY_SEED);
 
         move_to(
             &signer_resource,
@@ -101,9 +100,8 @@ module main::token_lock {
 
         let token_obj = object::address_to_object<token::Token>(token_address);
         primary_fungible_store::transfer(from, token_obj, capability_address(), amount);
-        let token_lock_table = &mut borrow_global_mut<TokenLockCapability>(
-            capability_address()
-        ).token_lock_table;
+        let token_lock_table =
+            &mut borrow_global_mut<TokenLockCapability>(capability_address()).token_lock_table;
 
         let token_lock_table_length = aptos_std::smart_table::length(token_lock_table);
         let caller_addr = signer::address_of(from);
@@ -123,13 +121,13 @@ module main::token_lock {
 
         smart_table::add(token_lock_table, token_lock_table_length, locked_tokens);
 
-        let user_address_map = &mut borrow_global_mut<TokenLockCapability>(
-            capability_address()
-        ).user_address_map;
+        let user_address_map =
+            &mut borrow_global_mut<TokenLockCapability>(capability_address()).user_address_map;
 
         if (simple_map::contains_key(user_address_map, &claimant_address)) {
-            let user_smart_table =
-                simple_map::borrow_mut(user_address_map, &claimant_address);
+            let user_smart_table = simple_map::borrow_mut(
+                user_address_map, &claimant_address
+            );
             let user_smart_table_length = aptos_std::smart_table::length(user_smart_table);
             smart_table::add(
                 user_smart_table, user_smart_table_length, token_lock_table_length
@@ -140,14 +138,15 @@ module main::token_lock {
             simple_map::add(user_address_map, claimant_address, user_smart_table);
         };
 
-        let token_address_map = &mut borrow_global_mut<TokenLockCapability>(
-            capability_address()
-        ).token_address_map;
+        let token_address_map =
+            &mut borrow_global_mut<TokenLockCapability>(capability_address()).token_address_map;
         if (simple_map::contains_key(token_address_map, &token_address)) {
-            let token_smart_table =
-                simple_map::borrow_mut(token_address_map, &token_address);
-            let token_smart_table_length =
-                aptos_std::smart_table::length(token_smart_table);
+            let token_smart_table = simple_map::borrow_mut(
+                token_address_map, &token_address
+            );
+            let token_smart_table_length = aptos_std::smart_table::length(
+                token_smart_table
+            );
             smart_table::add(
                 token_smart_table, token_smart_table_length, token_lock_table_length
             );
@@ -170,9 +169,8 @@ module main::token_lock {
 
     public entry fun claim(caller: &signer, row_id: u64) acquires TokenLockCapability {
         // assert!(is_finalized(token_address), ENOT_FINALIZED);
-        let token_lock_table = &mut borrow_global_mut<TokenLockCapability>(
-            capability_address()
-        ).token_lock_table;
+        let token_lock_table =
+            &mut borrow_global_mut<TokenLockCapability>(capability_address()).token_lock_table;
         let caller_addr = signer::address_of(caller);
         let locked_token_row = smart_table::borrow_mut(token_lock_table, row_id);
         let claimant_address = locked_token_row.claimant_address;
@@ -184,24 +182,24 @@ module main::token_lock {
         );
         assert!(locked_token_row.balance_amount > 0, EBALANCE_ZERO);
 
-        let token_obj = object::address_to_object<token::Token>(
-            locked_token_row.token_address
-        );
-        let claimed_amount = locked_token_row.initial_amount - locked_token_row.balance_amount;
-        let target_claim_amount = (
+        let token_obj =
+            object::address_to_object<token::Token>(locked_token_row.token_address);
+        let claimed_amount =
+            locked_token_row.initial_amount - locked_token_row.balance_amount;
+        let target_claim_amount =
             (
-                (timestamp::now_microseconds() - locked_token_row.cliff_timestamp) * locked_token_row
-                .initial_amount
-            ) / locked_token_row.vesting_duration
-        );
+                (
+                    (timestamp::now_microseconds() - locked_token_row.cliff_timestamp) * locked_token_row
+                    .initial_amount
+                ) / locked_token_row.vesting_duration
+            );
         if (target_claim_amount > locked_token_row.initial_amount) {
             target_claim_amount = locked_token_row.initial_amount
         };
 
         let amount = target_claim_amount - claimed_amount;
-        let min_claim_amount =
-            locked_token_row.initial_amount * locked_token_row.periodicity / locked_token_row
-                .vesting_duration;
+        let min_claim_amount = locked_token_row.initial_amount * locked_token_row.periodicity
+            / locked_token_row.vesting_duration;
         // debug::print(&utf8(b"timeDiff:"));
         // debug::print(&(timestamp::now_microseconds() - locked_token_row.cliff_timestamp));
         // debug::print(&utf8(b"vesting duration:"));
@@ -259,8 +257,7 @@ module main::token_lock {
 
     #[view]
     public fun get_token_locks_by_user(user_addr: address): vector<LockedTokenRow> acquires TokenLockCapability {
-        let user_address_map =
-            &borrow_global<TokenLockCapability>(capability_address()).user_address_map;
+        let user_address_map = &borrow_global<TokenLockCapability>(capability_address()).user_address_map;
         let user_smart_table = simple_map::borrow(user_address_map, &user_addr);
         let row_ids = smart_table::keys(user_smart_table);
         let user_smart_table_length = smart_table::length(user_smart_table);
@@ -269,8 +266,9 @@ module main::token_lock {
 
         while (i < user_smart_table_length) {
             let row_id = smart_table::borrow(user_smart_table, i);
-            let token_lock_table =
-                &borrow_global<TokenLockCapability>(capability_address()).token_lock_table;
+            let token_lock_table = &borrow_global<TokenLockCapability>(
+                capability_address()
+            ).token_lock_table;
             let locked_token_row = *smart_table::borrow(token_lock_table, *row_id);
             vector::push_back(&mut output, locked_token_row);
             i = i + 1;
@@ -280,8 +278,7 @@ module main::token_lock {
 
     #[view]
     public fun get_token_locks_by_token_address(token_addr: address): vector<LockedTokenRow> acquires TokenLockCapability {
-        let token_address_map =
-            &borrow_global<TokenLockCapability>(capability_address()).token_address_map;
+        let token_address_map = &borrow_global<TokenLockCapability>(capability_address()).token_address_map;
         let token_smart_table = simple_map::borrow(token_address_map, &token_addr);
         // let keys = smart_table::keys(token_smart_table);
         let token_smart_table_length = smart_table::length(token_smart_table);
@@ -291,8 +288,9 @@ module main::token_lock {
 
         while (i < token_smart_table_length) {
             let row_id = smart_table::borrow(token_smart_table, i);
-            let token_lock_table =
-                &borrow_global<TokenLockCapability>(capability_address()).token_lock_table;
+            let token_lock_table = &borrow_global<TokenLockCapability>(
+                capability_address()
+            ).token_lock_table;
             let locked_token_row = *smart_table::borrow(token_lock_table, *row_id);
             // let locked_token_row = get_token_lock_row(*row_id);
             vector::push_back(&mut output, locked_token_row);
@@ -303,8 +301,7 @@ module main::token_lock {
 
     #[view]
     public fun get_token_lock_row(row_id: u64): LockedTokenRow acquires TokenLockCapability {
-        let token_lock_table =
-            &borrow_global<TokenLockCapability>(capability_address()).token_lock_table;
+        let token_lock_table = &borrow_global<TokenLockCapability>(capability_address()).token_lock_table;
         *smart_table::borrow(token_lock_table, row_id)
     }
 

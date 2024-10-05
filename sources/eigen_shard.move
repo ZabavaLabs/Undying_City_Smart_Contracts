@@ -118,26 +118,25 @@ module main::eigen_shard {
     public entry fun set_token_name(caller: &signer, new_name: String) acquires EigenShardCapability {
         let caller_address = signer::address_of(caller);
         admin::assert_is_admin(caller_address);
-        let shard_token_capability = borrow_global<EigenShardCapability>(
-            shard_token_address()
-        );
+        let shard_token_capability =
+            borrow_global<EigenShardCapability>(shard_token_address());
         token::set_name(&shard_token_capability.mutator_ref, new_name);
     }
 
     public entry fun set_token_uri(caller: &signer, new_uri: String) acquires EigenShardCapability {
         let caller_address = signer::address_of(caller);
         admin::assert_is_admin(caller_address);
-        let shard_token_capability = borrow_global<EigenShardCapability>(
-            shard_token_address()
-        );
+        let shard_token_capability =
+            borrow_global<EigenShardCapability>(shard_token_address());
         token::set_uri(&shard_token_capability.mutator_ref, new_uri);
     }
 
     public entry fun set_collection_uri(caller: &signer, new_uri: String) acquires ShardCollectionCapability {
         let caller_address = signer::address_of(caller);
         admin::assert_is_admin(caller_address);
-        let collection_capability =
-            borrow_global<ShardCollectionCapability>(shard_collection_address());
+        let collection_capability = borrow_global<ShardCollectionCapability>(
+            shard_collection_address()
+        );
         collection::set_uri(&collection_capability.collection_mutator_ref, new_uri);
     }
 
@@ -146,8 +145,9 @@ module main::eigen_shard {
     ) acquires ShardCollectionCapability {
         let caller_address = signer::address_of(caller);
         admin::assert_is_admin(caller_address);
-        let collection_capability =
-            borrow_global<ShardCollectionCapability>(shard_collection_address());
+        let collection_capability = borrow_global<ShardCollectionCapability>(
+            shard_collection_address()
+        );
         collection::set_description(
             &collection_capability.collection_mutator_ref, new_description
         );
@@ -171,8 +171,9 @@ module main::eigen_shard {
             amount / 2 * admin_data.apt_cost_per_shard,
         );
 
-        let shard_token =
-            object::address_to_object<EigenShardCapability>(shard_token_address());
+        let shard_token = object::address_to_object<EigenShardCapability>(
+            shard_token_address()
+        );
         mint_internal(shard_token, signer::address_of(caller), amount);
     }
 
@@ -201,10 +202,9 @@ module main::eigen_shard {
         let metadata = object::convert<EigenShardCapability, Metadata>(shard);
         let shard_addr = object::object_address(&shard);
         let shard_token = borrow_global<EigenShardCapability>(shard_addr);
-        let from_store =
-            primary_fungible_store::ensure_primary_store_exists(
-                signer::address_of(from), metadata
-            );
+        let from_store = primary_fungible_store::ensure_primary_store_exists(
+            signer::address_of(from), metadata
+        );
         fungible_asset::burn_from(
             &shard_token.fungible_asset_burn_ref, from_store, amount
         );
@@ -217,20 +217,18 @@ module main::eigen_shard {
         let uri = string::utf8(EIGEN_SHARD_COLLECTION_URI);
 
         // Creates the collection with unlimited supply and without establishing any royalty configuration.
-        let collection_constructor_ref =
-            collection::create_unlimited_collection(
-                creator,
-                description,
-                name,
-                option::none(),
-                uri,
-            );
+        let collection_constructor_ref = collection::create_unlimited_collection(
+            creator,
+            description,
+            name,
+            option::none(),
+            uri,
+        );
 
         let object_signer = object::generate_signer(&collection_constructor_ref);
 
-        let collection_mutator_ref = collection::generate_mutator_ref(
-            &collection_constructor_ref
-        );
+        let collection_mutator_ref =
+            collection::generate_mutator_ref(&collection_constructor_ref);
 
         let collection_capability = ShardCollectionCapability { collection_mutator_ref };
         move_to(&object_signer, collection_capability);
@@ -251,15 +249,14 @@ module main::eigen_shard {
         let collection = string::utf8(EIGEN_SHARD_COLLECTION_NAME);
         // Creates the shard token, and get the constructor ref of the token. The constructor ref
         // is used to generate the refs of the token.
-        let constructor_ref =
-            token::create_named_token(
-                creator,
-                collection,
-                description,
-                token_name,
-                option::none(),
-                uri,
-            );
+        let constructor_ref = token::create_named_token(
+            creator,
+            collection,
+            description,
+            token_name,
+            option::none(),
+            uri,
+        );
 
         // Generates the object signer and the refs. The refs are used to manage the token.
         let object_signer = object::generate_signer(&constructor_ref);
@@ -317,8 +314,9 @@ module main::eigen_shard {
     public fun shard_balance(owner_addr: address): u64 {
         let shard_object = object::address_to_object(shard_token_address());
         let metadata = object::convert<EigenShardCapability, Metadata>(shard_object);
-        let store =
-            primary_fungible_store::ensure_primary_store_exists(owner_addr, metadata);
+        let store = primary_fungible_store::ensure_primary_store_exists(
+            owner_addr, metadata
+        );
         fungible_asset::balance(store)
     }
 
@@ -369,8 +367,9 @@ module main::eigen_shard {
         create_account_for_test(signer::address_of(user2));
 
         // let (burn_cap, freeze_cap, mint_cap) = initialize_and_register_fake_money(creator, 1, true);
-        let (burn_cap, mint_cap) =
-            aptos_framework::aptos_coin::initialize_for_test(aptos_framework);
+        let (burn_cap, mint_cap) = aptos_framework::aptos_coin::initialize_for_test(
+            aptos_framework
+        );
         coin::register<AptosCoin>(creator);
         coin::register<AptosCoin>(user1);
         coin::register<AptosCoin>(user2);

@@ -27,7 +27,7 @@ module main::leaderboard {
     use std::vector;
 
     // Error Codes
-    const ELEADERBOARD_SEASON_ENDED:u64 = 7;
+    const ELEADERBOARD_SEASON_ENDED: u64 = 7;
 
     struct LeaderboardStruct has key, store {
         leaderboard_vector: vector<LeaderboardElement>,
@@ -46,7 +46,11 @@ module main::leaderboard {
         let score_map = aptos_std::simple_map::new<address, u64>();
         let leaderboard_vector = vector::empty<LeaderboardElement>();
         let end_time = 0;
-        let leaderboardStruct = LeaderboardStruct { leaderboard_vector, score_map, end_time};
+        let leaderboardStruct = LeaderboardStruct {
+            leaderboard_vector,
+            score_map,
+            end_time
+        };
         move_to(deployer, leaderboardStruct);
     }
 
@@ -54,7 +58,7 @@ module main::leaderboard {
         assert_before_end_time();
         let leaderboardStruct = borrow_global_mut<LeaderboardStruct>(@main);
         let current_score = 0;
-        if (simple_map::contains_key(&leaderboardStruct.score_map, &user_addr)){
+        if (simple_map::contains_key(&leaderboardStruct.score_map, &user_addr)) {
             current_score = *simple_map::borrow(&leaderboardStruct.score_map, &user_addr);
         };
 
@@ -72,12 +76,12 @@ module main::leaderboard {
         while (i < leaderboard_length) {
             let leaderboardElement = *vector::borrow(leaderboard_vector, i);
             let entry_score = leaderboardElement.score;
-            if (new_score > entry_score && !new_highscore ){
+            if (new_score > entry_score && !new_highscore) {
                 new_highscore = true;
                 insert_index = i;
-            } ;
+            };
             let entry_addr = leaderboardElement.addr;
-            if (entry_addr == user_addr){
+            if (entry_addr == user_addr) {
                 previous_entry_exists = true;
                 remove_index = i;
             };
@@ -94,38 +98,35 @@ module main::leaderboard {
             vector::remove(leaderboard_vector, remove_index);
             let new_entry = LeaderboardElement { addr: user_addr, score: new_score };
             vector::insert(leaderboard_vector, insert_index, new_entry);
-        } 
-        else if (previous_entry_exists && !new_highscore ) {
+        } else if (previous_entry_exists && !new_highscore) {
             // TODO: Do nothing as we don't want to add additional entry
-        }
-        else if (!previous_entry_exists && new_highscore ) {
+        } else if (!previous_entry_exists && new_highscore) {
             let new_entry = LeaderboardElement { addr: user_addr, score: new_score };
             vector::insert(leaderboard_vector, insert_index, new_entry);
-        } 
-        else if (!previous_entry_exists && !new_highscore ) {
+        } else if (!previous_entry_exists && !new_highscore) {
             let new_entry = LeaderboardElement { addr: user_addr, score: new_score };
             vector::insert(leaderboard_vector, leaderboard_length, new_entry);
         };
 
         //Keep only top 20
         let max_leaderboard_length = 20;
-        while(vector::length(leaderboard_vector) > max_leaderboard_length) {
+        while (vector::length(leaderboard_vector) > max_leaderboard_length) {
             vector::pop_back(leaderboard_vector);
         };
     }
 
     entry fun reset_leaderboard(account: &signer, end_time: u64) acquires LeaderboardStruct {
         admin::assert_is_admin(signer::address_of(account));
-        
+
         let leaderboardStruct = borrow_global_mut<LeaderboardStruct>(@main);
         leaderboardStruct.score_map = aptos_std::simple_map::new<address, u64>();
         leaderboardStruct.leaderboard_vector = vector::empty<LeaderboardElement>();
         leaderboardStruct.end_time = end_time;
     }
 
-    public fun assert_before_end_time() acquires LeaderboardStruct{
+    public fun assert_before_end_time() acquires LeaderboardStruct {
         let end_time = borrow_global<LeaderboardStruct>(@main).end_time;
-        assert!(timestamp::now_microseconds() < end_time,ELEADERBOARD_SEASON_ENDED);
+        assert!(timestamp::now_microseconds() < end_time, ELEADERBOARD_SEASON_ENDED);
     }
 
     #[view]
@@ -141,15 +142,14 @@ module main::leaderboard {
     }
 
     #[view]
-    public fun user_score(user_addr:address): u64 acquires LeaderboardStruct {
+    public fun user_score(user_addr: address): u64 acquires LeaderboardStruct {
         let leaderboardStruct = borrow_global<LeaderboardStruct>(@main);
-        let contains_key = aptos_std::simple_map::contains_key(&leaderboardStruct.score_map, &user_addr);
-        if (!contains_key){
-            0   
-        }else{
+        let contains_key =
+            aptos_std::simple_map::contains_key(&leaderboardStruct.score_map, &user_addr);
+        if (!contains_key) { 0 }
+        else {
             *simple_map::borrow(&leaderboardStruct.score_map, &user_addr)
         }
-
     }
 
     // Testing functions
@@ -159,8 +159,7 @@ module main::leaderboard {
     }
 
     #[test_only]
-    public fun reset_leaderboard_for_test(creator: &signer, end_time:u64) acquires LeaderboardStruct {
+    public fun reset_leaderboard_for_test(creator: &signer, end_time: u64) acquires LeaderboardStruct {
         reset_leaderboard(creator, end_time);
     }
-
 }
