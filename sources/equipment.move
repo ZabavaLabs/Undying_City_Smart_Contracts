@@ -394,7 +394,7 @@ module main::equipment{
     }
    
     // TODO: Need to remove friend for testnet because signature
-    public entry fun upgrade_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, amount: u64) acquires EquipmentCapability,  EquipmentData {
+    public(friend) entry fun upgrade_equipment(from: &signer, equipment_object: Object<EquipmentCapability>, amount: u64) acquires EquipmentCapability,  EquipmentData {
         assert!(object::is_owner(equipment_object, signer::address_of(from)), ENOT_OWNER);
         assert!(amount>0, EINVALID_PROPERTY_VALUE);
         let collection = token::collection_object(equipment_object);
