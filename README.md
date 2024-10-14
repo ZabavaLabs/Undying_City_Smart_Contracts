@@ -1,6 +1,18 @@
 # Undying City Smart Contracts
 These smart contracts are for our game Undying City.
 
+## About the Game
+Undying City is a mobile-first Roguelike game where players have to survive against hordes of enemies coming at you. Kill enemies to gain experience and level up to learn more abilities.
+Equipment is completely NFT based and players can level up their equipment to make it stronger.
+
+## Relationship to Aptos
+The game is built on the Aptos blockchain. It originally started from a hackathon project but has since grown into a full game with more features being added. We are also an Aptos grant recipient.
+
+## Socials
+- [Website](https://undyingcity.zabavalabs.com)
+- [Twitter](https://twitter.com/UndyingCity)
+- [Telegram](https://t.me/ZabavaCommunity/27676)
+
 ## Architecture
 
 ### admin
