@@ -9,6 +9,7 @@ module main::omni_cache {
     use aptos_framework::timestamp;
 
     use std::string::{Self, String};
+    use std::vector;
     // use aptos_std::string_utils::{to_string};
 
     use main::eigen_shard::{Self, EigenShardCapability};
@@ -20,6 +21,8 @@ module main::omni_cache {
     friend main::omni_cache_test;
 
     const EINVALID_TABLE_LENGTH: u64 = 4;
+    const EINVALID_PROPERTY_VALUE: u64 = 5;
+
     const EINVALID_BALANCE: u64 = 6;
     const EINVALID_PERIOD: u64 = 8;
 
@@ -213,6 +216,10 @@ module main::omni_cache {
     ) acquires SpecialEventsInfoEntry {
         let account_addr = signer::address_of(account);
         admin::assert_is_admin(account_addr);
+        assert!(
+            vector::length(&address_vector) == vector::length(&amount_vector),
+            EINVALID_PROPERTY_VALUE
+        );
         let special_events_info_entry = borrow_global_mut<SpecialEventsInfoEntry>(@main);
         simple_map::add_all(
             &mut special_events_info_entry.whitelist_map, address_vector, amount_vector
