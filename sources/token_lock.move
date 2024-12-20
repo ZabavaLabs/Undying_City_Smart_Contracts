@@ -199,20 +199,14 @@ module main::token_lock {
         let amount = target_claim_amount - claimed_amount;
         let min_claim_amount = locked_token_row.initial_amount * locked_token_row.periodicity
             / locked_token_row.vesting_duration;
-        // debug::print(&utf8(b"timeDiff:"));
-        // debug::print(&(timestamp::now_microseconds() - locked_token_row.cliff_timestamp));
-        // debug::print(&utf8(b"vesting duration:"));
-        // debug::print(&locked_token_row.vesting_duration);
-        // debug::print(&utf8(b"initial amount:"));
-        // debug::print(&locked_token_row.initial_amount);
-        // debug::print(&utf8(b"target_claim_amount:"));
-        // debug::print(&target_claim_amount);
-        // debug::print(&utf8(b"amount:"));
-        // debug::print(&amount);
-        // debug::print(&utf8(b"min_claim_amount:"));
-        // debug::print(&min_claim_amount);
-
-        assert!(amount >= min_claim_amount, EPERIOD_NOT_PASSED);
+        
+        // Only enforce minimum claim amount if it's not the final claim
+        if (amount < locked_token_row.balance_amount) {
+            assert!(amount >= min_claim_amount, EPERIOD_NOT_PASSED);
+        } else {
+            // For final claim, just claim the remaining balance
+            amount = locked_token_row.balance_amount;
+        };
 
         locked_token_row.balance_amount = locked_token_row.balance_amount - amount;
         locked_token_row.last_claimed_timestamp = timestamp::now_microseconds();
