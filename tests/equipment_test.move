@@ -148,6 +148,7 @@ module main::equipment_test{
         100, 10, 11, 12, 50,
         10, 5, 5, 5, 5);
         admin::set_admin(creator, signer::address_of(user1));
+        admin::acknowledge_admin(user1);
         equipment::add_equipment_entry(user1, 
         string::utf8(b"Equipment Name"), 
         string::utf8(b"Equipment Description"),
@@ -178,6 +179,7 @@ module main::equipment_test{
         100, 10, 11, 12, 50,
         10, 5, 5, 5, 5);
         admin::set_admin(creator, signer::address_of(user1));
+        admin::acknowledge_admin(user1);
         equipment::add_equipment_entry(creator, 
         string::utf8(b"Equipment Name"), 
         string::utf8(b"Equipment Description"),

@@ -29,7 +29,6 @@ module main::token_lock {
     const EPERIOD_NOT_PASSED: u64 = 5;
     const EINVALID_DATA: u64 = 11;
     const APP_SIGNER_CAPABILITY_SEED: vector<u8> = b"TOKEN_LOCK_SIGNER_CAPABILITY";
-    const DAY_IN_MICROSECONDS: u64 = 24 * 60 * 60 * 1000_000;
 
     // TODO: ADD EVENT FOR TOKEN LOCK ROW ADDED
     // TODO: ADD EVENT FOR TOKENS CLAIMED
@@ -97,7 +96,7 @@ module main::token_lock {
         periodicity: u64,
         claimant_address: address
     ) acquires TokenLockCapability {
-
+        assert!(amount > 0, EINVALID_DATA);
         let token_obj = object::address_to_object<token::Token>(token_address);
         primary_fungible_store::transfer(from, token_obj, capability_address(), amount);
         let token_lock_table =
@@ -200,20 +199,14 @@ module main::token_lock {
         let amount = target_claim_amount - claimed_amount;
         let min_claim_amount = locked_token_row.initial_amount * locked_token_row.periodicity
             / locked_token_row.vesting_duration;
-        // debug::print(&utf8(b"timeDiff:"));
-        // debug::print(&(timestamp::now_microseconds() - locked_token_row.cliff_timestamp));
-        // debug::print(&utf8(b"vesting duration:"));
-        // debug::print(&locked_token_row.vesting_duration);
-        // debug::print(&utf8(b"initial amount:"));
-        // debug::print(&locked_token_row.initial_amount);
-        // debug::print(&utf8(b"target_claim_amount:"));
-        // debug::print(&target_claim_amount);
-        // debug::print(&utf8(b"amount:"));
-        // debug::print(&amount);
-        // debug::print(&utf8(b"min_claim_amount:"));
-        // debug::print(&min_claim_amount);
-
-        assert!(amount >= min_claim_amount, EPERIOD_NOT_PASSED);
+        
+        // Only enforce minimum claim amount if it's not the final claim
+        if (amount < locked_token_row.balance_amount) {
+            assert!(amount >= min_claim_amount, EPERIOD_NOT_PASSED);
+        } else {
+            // For final claim, just claim the remaining balance
+            amount = locked_token_row.balance_amount;
+        };
 
         locked_token_row.balance_amount = locked_token_row.balance_amount - amount;
         locked_token_row.last_claimed_timestamp = timestamp::now_microseconds();
@@ -259,7 +252,6 @@ module main::token_lock {
     public fun get_token_locks_by_user(user_addr: address): vector<LockedTokenRow> acquires TokenLockCapability {
         let user_address_map = &borrow_global<TokenLockCapability>(capability_address()).user_address_map;
         let user_smart_table = simple_map::borrow(user_address_map, &user_addr);
-        let row_ids = smart_table::keys(user_smart_table);
         let user_smart_table_length = smart_table::length(user_smart_table);
         let output: vector<LockedTokenRow> = vector::empty();
         let i = 0;

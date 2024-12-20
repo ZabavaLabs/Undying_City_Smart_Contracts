@@ -25,7 +25,7 @@ module main::daily_spins {
 
     use main::admin;
 
-    const EINVALID_COLLECTION: u64 = 1;
+
     const EUNABLE_TO_SPIN: u64 = 2;
 
     // #[test_only]
@@ -34,9 +34,6 @@ module main::daily_spins {
     #[test_only]
     friend main::leaderboard_test;
 
-    // Error Codes
-
-    const EUNABLE_TO_CLAIM: u64 = 6;
 
     // 1 Day
     const TIME_BETWEEN_SPINS: u64 = 24 * 60 * 60 * 1_000_000;
@@ -76,8 +73,6 @@ module main::daily_spins {
         let spin_result_table_length = spin_result_table_length();
         let random_number = randomness::u64_range(0, spin_result_table_length);
         let user_addr = signer::address_of(user);
-        debug::print(&utf8(b"spin random number was:"));
-        debug::print(&random_number);
 
         let spin_capability = borrow_global_mut<SpinData>(@main);
 

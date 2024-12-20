@@ -780,7 +780,12 @@ module main::equipment {
     ) acquires EquipmentEnhanceInfo {
 
         admin::assert_is_admin(signer::address_of(account));
-
+            let length = vector::length(&equipment_id_vector);
+        assert!(
+            length == vector::length(&grade_vector) && 
+            length == vector::length(&new_url_vector),
+            EINVALID_PROPERTY_VALUE
+        );
         let equipment_upgrade_info_map =
             &mut borrow_global_mut<EquipmentEnhanceInfo>(
                 equipment_upgrade_info_address()

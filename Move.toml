@@ -1,6 +1,7 @@
 [package]
 name = "main"
 version = "1.0.0"
+upgrade_policy = "compatible"
 
 [addresses]
 main = "bba39d1e7e7f253df025d7c5079fd3be7eced4312509fba5946410143e2bda18"
@@ -20,4 +21,3 @@ subdir = 'aptos-move/framework/aptos-token-objects'
 git = "https://github.com/aptos-labs/aptos-core.git"
 rev = "mainnet"
 subdir = "aptos-move/framework/aptos-stdlib"
-

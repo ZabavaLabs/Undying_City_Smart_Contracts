@@ -9,6 +9,7 @@ module main::omni_cache {
     use aptos_framework::timestamp;
 
     use std::string::{Self, String};
+    use std::vector;
     // use aptos_std::string_utils::{to_string};
 
     use main::eigen_shard::{Self, EigenShardCapability};
@@ -20,8 +21,12 @@ module main::omni_cache {
     friend main::omni_cache_test;
 
     const EINVALID_TABLE_LENGTH: u64 = 4;
+    const EINVALID_PROPERTY_VALUE: u64 = 5;
+
     const EINVALID_BALANCE: u64 = 6;
     const EINVALID_PERIOD: u64 = 8;
+
+    const EINVALID_CACHE_ID: u64 = 9;
 
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     struct OmniCacheData has key {
@@ -158,6 +163,8 @@ module main::omni_cache {
     ) acquires NormalEquipmentCacheData, SpecialEquipmentCacheData {
         let account_addr = signer::address_of(account);
         admin::assert_is_admin(account_addr);
+        
+        assert!(cache_id == 0 || cache_id == 1, EINVALID_CACHE_ID);
 
         if (cache_id == 0) {
             let normal_equipment_cache_table = &mut borrow_global_mut<
@@ -213,6 +220,10 @@ module main::omni_cache {
     ) acquires SpecialEventsInfoEntry {
         let account_addr = signer::address_of(account);
         admin::assert_is_admin(account_addr);
+        assert!(
+            vector::length(&address_vector) == vector::length(&amount_vector),
+            EINVALID_PROPERTY_VALUE
+        );
         let special_events_info_entry = borrow_global_mut<SpecialEventsInfoEntry>(@main);
         simple_map::add_all(
             &mut special_events_info_entry.whitelist_map, address_vector, amount_vector
@@ -229,6 +240,7 @@ module main::omni_cache {
     ) acquires SpecialEventsInfoEntry {
         let account_addr = signer::address_of(account);
         admin::assert_is_admin(account_addr);
+        assert!(end_time > start_time, EINVALID_PERIOD);
         let special_events_info_entry = borrow_global_mut<SpecialEventsInfoEntry>(@main);
         special_events_info_entry.name = name;
         special_events_info_entry.start_time = start_time;
@@ -247,6 +259,9 @@ module main::omni_cache {
     ) acquires NormalEquipmentCacheData, SpecialEquipmentCacheData {
         let account_addr = signer::address_of(account);
         admin::assert_is_admin(account_addr);
+        
+        assert!(cache_id == 0 || cache_id == 1, EINVALID_CACHE_ID);
+
         if (cache_id == 0) {
             let normal_equipment_cache_table = &mut borrow_global_mut<
                 NormalEquipmentCacheData>(@main).table;
@@ -343,6 +358,8 @@ module main::omni_cache {
     public fun get_equipment_id_from_cache_row_id(
         cache_id: u64, row_id: u64
     ): u64 acquires SpecialEquipmentCacheData, NormalEquipmentCacheData {
+        assert!(cache_id == 0 || cache_id == 1, EINVALID_CACHE_ID);
+        
         if (cache_id == 0) {
             let normal_equipment_cache_table = &borrow_global<NormalEquipmentCacheData>(
                 @main
@@ -360,6 +377,8 @@ module main::omni_cache {
 
     #[view]
     public fun get_table_length_from_cache(cache_id: u64): u64 acquires SpecialEquipmentCacheData, NormalEquipmentCacheData {
+        assert!(cache_id == 0 || cache_id == 1, EINVALID_CACHE_ID);
+        
         if (cache_id == 0) {
             let normal_equipment_cache_table = &borrow_global<NormalEquipmentCacheData>(
                 @main

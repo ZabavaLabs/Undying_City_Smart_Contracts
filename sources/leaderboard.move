@@ -117,7 +117,8 @@ module main::leaderboard {
 
     entry fun reset_leaderboard(account: &signer, end_time: u64) acquires LeaderboardStruct {
         admin::assert_is_admin(signer::address_of(account));
-
+        assert!(timestamp::now_microseconds() < end_time, ELEADERBOARD_SEASON_ENDED);
+        
         let leaderboardStruct = borrow_global_mut<LeaderboardStruct>(@main);
         leaderboardStruct.score_map = aptos_std::simple_map::new<address, u64>();
         leaderboardStruct.leaderboard_vector = vector::empty<LeaderboardElement>();
