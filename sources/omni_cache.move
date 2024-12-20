@@ -240,6 +240,7 @@ module main::omni_cache {
     ) acquires SpecialEventsInfoEntry {
         let account_addr = signer::address_of(account);
         admin::assert_is_admin(account_addr);
+        assert!(end_time > start_time, EINVALID_PERIOD);
         let special_events_info_entry = borrow_global_mut<SpecialEventsInfoEntry>(@main);
         special_events_info_entry.name = name;
         special_events_info_entry.start_time = start_time;
