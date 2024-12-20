@@ -25,7 +25,7 @@ module main::daily_spins {
 
     use main::admin;
 
-    const EINVALID_COLLECTION: u64 = 1;
+
     const EUNABLE_TO_SPIN: u64 = 2;
 
     // #[test_only]
@@ -34,9 +34,6 @@ module main::daily_spins {
     #[test_only]
     friend main::leaderboard_test;
 
-    // Error Codes
-
-    const EUNABLE_TO_CLAIM: u64 = 6;
 
     // 1 Day
     const TIME_BETWEEN_SPINS: u64 = 24 * 60 * 60 * 1_000_000;
