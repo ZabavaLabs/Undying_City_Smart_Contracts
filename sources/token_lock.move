@@ -252,7 +252,6 @@ module main::token_lock {
     public fun get_token_locks_by_user(user_addr: address): vector<LockedTokenRow> acquires TokenLockCapability {
         let user_address_map = &borrow_global<TokenLockCapability>(capability_address()).user_address_map;
         let user_smart_table = simple_map::borrow(user_address_map, &user_addr);
-        let row_ids = smart_table::keys(user_smart_table);
         let user_smart_table_length = smart_table::length(user_smart_table);
         let output: vector<LockedTokenRow> = vector::empty();
         let i = 0;
