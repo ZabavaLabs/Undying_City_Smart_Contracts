@@ -96,7 +96,7 @@ module main::token_lock {
         periodicity: u64,
         claimant_address: address
     ) acquires TokenLockCapability {
-
+        assert!(amount > 0, EINVALID_DATA);
         let token_obj = object::address_to_object<token::Token>(token_address);
         primary_fungible_store::transfer(from, token_obj, capability_address(), amount);
         let token_lock_table =
