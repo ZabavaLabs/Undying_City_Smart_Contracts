@@ -4,3 +4,4 @@ experimental
 *.key
 *.pub
 CLIcommands.txt
+.vscode/

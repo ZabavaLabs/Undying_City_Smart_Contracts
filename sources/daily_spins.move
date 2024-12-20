@@ -76,8 +76,8 @@ module main::daily_spins {
         let spin_result_table_length = spin_result_table_length();
         let random_number = randomness::u64_range(0, spin_result_table_length);
         let user_addr = signer::address_of(user);
-        debug::print(&utf8(b"spin random number was:"));
-        debug::print(&random_number);
+        // debug::print(&utf8(b"spin random number was:"));
+        // debug::print(&random_number);
 
         let spin_capability = borrow_global_mut<SpinData>(@main);
 
