@@ -26,6 +26,8 @@ module main::omni_cache {
     const EINVALID_BALANCE: u64 = 6;
     const EINVALID_PERIOD: u64 = 8;
 
+    const EINVALID_CACHE_ID: u64 = 9;
+
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     struct OmniCacheData has key {
         shards_to_unlock_cache: u64,
@@ -161,6 +163,8 @@ module main::omni_cache {
     ) acquires NormalEquipmentCacheData, SpecialEquipmentCacheData {
         let account_addr = signer::address_of(account);
         admin::assert_is_admin(account_addr);
+        
+        assert!(cache_id == 0 || cache_id == 1, EINVALID_CACHE_ID);
 
         if (cache_id == 0) {
             let normal_equipment_cache_table = &mut borrow_global_mut<
@@ -254,6 +258,9 @@ module main::omni_cache {
     ) acquires NormalEquipmentCacheData, SpecialEquipmentCacheData {
         let account_addr = signer::address_of(account);
         admin::assert_is_admin(account_addr);
+        
+        assert!(cache_id == 0 || cache_id == 1, EINVALID_CACHE_ID);
+
         if (cache_id == 0) {
             let normal_equipment_cache_table = &mut borrow_global_mut<
                 NormalEquipmentCacheData>(@main).table;
@@ -350,6 +357,8 @@ module main::omni_cache {
     public fun get_equipment_id_from_cache_row_id(
         cache_id: u64, row_id: u64
     ): u64 acquires SpecialEquipmentCacheData, NormalEquipmentCacheData {
+        assert!(cache_id == 0 || cache_id == 1, EINVALID_CACHE_ID);
+        
         if (cache_id == 0) {
             let normal_equipment_cache_table = &borrow_global<NormalEquipmentCacheData>(
                 @main
@@ -367,6 +376,8 @@ module main::omni_cache {
 
     #[view]
     public fun get_table_length_from_cache(cache_id: u64): u64 acquires SpecialEquipmentCacheData, NormalEquipmentCacheData {
+        assert!(cache_id == 0 || cache_id == 1, EINVALID_CACHE_ID);
+        
         if (cache_id == 0) {
             let normal_equipment_cache_table = &borrow_global<NormalEquipmentCacheData>(
                 @main
